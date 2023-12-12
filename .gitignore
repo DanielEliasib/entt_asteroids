@@ -1,0 +1,11 @@
+.cache/
+bin/
+obj/
+.nvim/
+**/Makefile
+MakeFile
+
+.clang-format
+compile_commands.json
+
+libs/raylib/
