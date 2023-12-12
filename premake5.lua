@@ -12,7 +12,7 @@ project "asteroids"
 
 	targetdir "bin/%{prj.name}/%{cfg.buildcfg}"
 	objdir "obj/%{prj.name}/%{cfg.buildcfg}"
-	targetname "boids"
+	targetname "asteroids"
 
 	includedirs { "%{prj.location}/include" }
 

@@ -9,3 +9,4 @@ MakeFile
 compile_commands.json
 
 libs/raylib/
+raylib/
