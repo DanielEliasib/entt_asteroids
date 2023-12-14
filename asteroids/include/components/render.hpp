@@ -11,7 +11,7 @@ struct render
     std::vector<Vector2> points;
 };
 
-void add_render_data(entt::registry& registry, entt::entity entity, Color color)
+inline static void add_render_data(entt::registry& registry, entt::entity entity, Color color)
 {
     int side     = 10;
     float height = sqrt(pow(side, 2) - pow(side / 2, 2));

@@ -8,6 +8,8 @@
 #include <processors/physics_processors.hpp>
 #include <processors/render_processors.hpp>
 
+#include "utils/input_handler.hpp"
+
 int main()
 {
     const char* TITLE = "ASTEROIDS";
@@ -27,21 +29,24 @@ int main()
 
     create_player(registry, 0);
 
+    input_handler input_handler(registry);
+
     while (!WindowShouldClose())
     {
         const uint32_t delta_time = GetFrameTime() * 1000;
+
+        input_handler.handle_input();
 
         general_scheduler.update(delta_time);
 
         BeginDrawing();
         ClearBackground(background_color);
         DrawText(TITLE, 10, 10, 20, text_color);
+        DrawFPS(10, 30);
 
         render_scheduler.update(delta_time);
 
         EndDrawing();
-
-        std::cout << "FPS: " << GetFPS() << std::endl;
     }
 
     return 0;

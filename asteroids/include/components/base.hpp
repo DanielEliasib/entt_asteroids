@@ -14,6 +14,9 @@ struct physics
 {
     Vector2 velocity;
     float angular_velocity;
+
+    Vector2 external_force;
+    Vector2 external_impulse;
 };
 
 #endif // BASE_DEFINITIONS_HPP
