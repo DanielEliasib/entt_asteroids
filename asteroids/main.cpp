@@ -26,10 +26,15 @@ int main()
 
     entt::scheduler render_scheduler;
     render_scheduler.attach<render_process>(registry);
+    render_scheduler.attach<camera_process>(registry);
 
     create_player(registry, 0);
 
     input_handler input_handler(registry);
+
+    // Add a raylib camera
+
+    spawn_main_camera(registry);
 
     while (!WindowShouldClose())
     {
@@ -41,11 +46,16 @@ int main()
 
         BeginDrawing();
         ClearBackground(background_color);
+
+        Camera2D camera = registry.get<Camera2D>(registry.view<Camera2D>().front());
+        BeginMode2D(camera);
+
         DrawText(TITLE, 10, 10, 20, text_color);
         DrawFPS(10, 30);
 
         render_scheduler.update(delta_time);
 
+        EndMode2D();
         EndDrawing();
     }
 

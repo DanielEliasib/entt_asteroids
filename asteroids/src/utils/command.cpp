@@ -25,7 +25,7 @@ void mouse_input_command::execute(Vector2 input)
     for (auto [entity, player_data, physics_data, transform_data] : physics_view.each())
     {
         Vector2 mouse_position  = Vector2{input.x, input.y};
-        Vector2 player_position = transform_data.position;
+        Vector2 player_position = Vector2{static_cast<float>(GetScreenWidth() / 2), static_cast<float>(GetScreenHeight() / 2)};
         Vector2 direction       = Vector2Normalize(Vector2Subtract(mouse_position, player_position));
         float angle             = atan2(direction.y, direction.x) * RAD2DEG;
         transform_data.rotation = angle;

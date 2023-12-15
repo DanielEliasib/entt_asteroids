@@ -18,6 +18,7 @@ input_handler::~input_handler()
 
 void input_handler::handle_input()
 {
+    // if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) && acceleration_button_pressed != nullptr)
     if (IsKeyDown(KEY_SPACE) && acceleration_button_pressed != nullptr)
     {
         acceleration_button_pressed->execute(Vector2Zero());

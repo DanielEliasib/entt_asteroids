@@ -26,4 +26,17 @@ inline static void add_render_data(entt::registry& registry, entt::entity entity
     registry.emplace<render>(entity, render_data);
 }
 
+inline static void spawn_main_camera(entt::registry& registry)
+{
+    entt::entity entity = registry.create();
+
+    Camera2D camera;
+    camera.target   = {0, 0};
+    camera.offset   = {static_cast<float>(GetScreenWidth() / 2), static_cast<float>(GetScreenHeight() / 2)};
+    camera.rotation = 0.0f;
+    camera.zoom     = 1.0f;
+
+    registry.emplace<Camera2D>(entity, camera);
+}
+
 #endif // RENDER_HPP

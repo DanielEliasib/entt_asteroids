@@ -9,6 +9,8 @@
 #include <entt/entt.hpp>
 #include <iostream>
 
+#include "player.hpp"
+
 struct render_process : entt::process<render_process, std::uint32_t>
 {
     using delta_type = std::uint32_t;
@@ -46,6 +48,28 @@ struct render_process : entt::process<render_process, std::uint32_t>
 
             rlPopMatrix();
         }
+    }
+
+   protected:
+    entt::registry& registry;
+};
+
+struct camera_process : entt::process<camera_process, std::uint32_t>
+{
+    using delta_type = std::uint32_t;
+
+    camera_process(entt::registry& registry) :
+        registry(registry) {}
+
+    void update(delta_type delta_time, void*)
+    {
+        auto camera_entity = registry.view<Camera2D>().front();
+        auto player_entity = registry.view<Player, transform>().front();
+
+        auto& camera_data           = registry.get<Camera2D>(camera_entity);
+        auto& player_transform_data = registry.get<transform>(player_entity);
+
+        camera_data.target = player_transform_data.position;
     }
 
    protected:
