@@ -2,8 +2,7 @@
 #define INPUT_HANDLER_HPP
 
 #include <entt/entt.hpp>
-
-#include "utils/events.hpp"
+#include <utils/command.hpp>
 
 class input_handler {
    public:
@@ -13,7 +12,8 @@ class input_handler {
     void handle_input();
 
    private:
-    event* acceleration_button_pressed;
+    command* acceleration_button_pressed;
+    command* mouse_moved;
     entt::registry& registry;
 };
 

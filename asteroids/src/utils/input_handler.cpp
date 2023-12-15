@@ -2,10 +2,13 @@
 
 #include <utils/input_handler.hpp>
 
+#include "raymath.h"
+
 input_handler::input_handler(entt::registry& registry) :
     registry(registry)
 {
-    acceleration_button_pressed = new acceleration_button_pressed_event(registry);
+    acceleration_button_pressed = new acceleration_input_command(registry);
+    mouse_moved                 = new mouse_input_command(registry);
 }
 
 input_handler::~input_handler()
@@ -17,6 +20,12 @@ void input_handler::handle_input()
 {
     if (IsKeyDown(KEY_SPACE) && acceleration_button_pressed != nullptr)
     {
-        acceleration_button_pressed->execute();
+        acceleration_button_pressed->execute(Vector2Zero());
+    }
+
+    if (mouse_moved != nullptr)
+    {
+        auto mouse_position = GetMousePosition();
+        mouse_moved->execute(mouse_position);
     }
 }
