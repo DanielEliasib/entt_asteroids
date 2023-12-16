@@ -5,25 +5,40 @@
 
 #include "raylib.h"
 
-struct render
+enum class render_shape_type
 {
-    Color color;
-    std::vector<Vector2> points;
+    TRIANGLE,
+    CIRCLE
 };
 
+struct shape_render
+{
+    Color color;
+    render_shape_type shape;
+    void* data;
+};
+
+static std::vector<Vector2>* original_triangle = nullptr;
 inline static void add_render_data(entt::registry& registry, entt::entity entity, Color color)
 {
-    int side     = 10;
-    float height = sqrt(pow(side, 2) - pow(side / 2, 2));
+    if (original_triangle == nullptr)
+    {
+        int side     = 10;
+        float height = sqrt(pow(side, 2) - pow(side / 2, 2));
 
-    Vector2 v1 = Vector2{0 - height / 2, 0 - side / 2.0f};
-    Vector2 v2 = Vector2{0 - height / 2, 0 + side / 2.0f};
-    Vector2 v3 = Vector2{0 + height / 2, 0};
+        Vector2 v1 = Vector2{0 - height / 2, 0 - side / 2.0f};
+        Vector2 v2 = Vector2{0 - height / 2, 0 + side / 2.0f};
+        Vector2 v3 = Vector2{0 + height / 2, 0};
 
-    std::vector<Vector2> original_triangle = {v1, v2, v3};
+        original_triangle = new std::vector<Vector2>{v1, v2, v3};
+    }
 
-    render render_data{color, original_triangle};
-    registry.emplace<render>(entity, render_data);
+    shape_render render_data;
+    render_data.color = color;
+    render_data.shape = render_shape_type::TRIANGLE;
+    render_data.data  = static_cast<void*>(original_triangle->data());
+
+    registry.emplace<shape_render>(entity, render_data);
 }
 
 inline static void spawn_main_camera(entt::registry& registry)

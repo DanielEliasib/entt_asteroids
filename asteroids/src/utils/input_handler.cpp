@@ -1,7 +1,9 @@
 #include <raylib.h>
 
+#include <math.hpp>
 #include <utils/input_handler.hpp>
 
+#include "player.hpp"
 #include "raymath.h"
 
 input_handler::input_handler(entt::registry& registry) :
@@ -18,10 +20,20 @@ input_handler::~input_handler()
 
 void input_handler::handle_input()
 {
-    // if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) && acceleration_button_pressed != nullptr)
     if (IsKeyDown(KEY_SPACE) && acceleration_button_pressed != nullptr)
     {
         acceleration_button_pressed->execute(Vector2Zero());
+    }
+
+    if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) && acceleration_button_pressed != nullptr)
+    {
+        auto player_entity    = registry.view<Player, transform>().front();
+        auto player_transform = registry.get<transform>(player_entity);
+
+        auto angle           = player_transform.rotation * DEG2RAD;
+        auto direction       = Vector2{cos(angle), sin(angle)};
+        auto bullet_velocity = direction * 90.0f;
+        spawn_bullet(registry, player_transform.position, bullet_velocity);
     }
 
     if (mouse_moved != nullptr)

@@ -8,6 +8,7 @@
 #include <components/render.hpp>
 #include <entt/entt.hpp>
 #include <iostream>
+#include <variant>
 
 #include "player.hpp"
 
@@ -20,30 +21,35 @@ struct render_process : entt::process<render_process, std::uint32_t>
 
     void update(delta_type delta_time, void*)
     {
-        auto render_view = registry.view<transform, render>();
+        auto render_view = registry.view<transform, shape_render>();
 
         for (auto [entity, transform_data, render_data] : render_view.each())
         {
-            std::vector<Vector2> vertices = render_data.points;
-
             rlPushMatrix();
             rlTranslatef(transform_data.position.x, transform_data.position.y, 0.0f);
             rlRotatef(transform_data.rotation, 0.0f, 0.0f, 1.0f);
 
-            // TODO: Add support for non triangles
-            if (vertices.size() == 3)
+            switch (render_data.shape)
             {
-                DrawTriangle(vertices[0], vertices[1], vertices[2],
-                             render_data.color);
+                case render_shape_type::TRIANGLE: {
+                    auto data = static_cast<Vector2*>(render_data.data);
+                    std::vector<Vector2> vertices(data, data + 3);
 
-                DrawCircleV(vertices[0], 1.4f, GREEN);
-                DrawCircleV(vertices[1], 1.4f, RED);
-                DrawCircleV(vertices[2], 1.6f, BLUE);
+                    DrawTriangle(vertices[0], vertices[1], vertices[2],
+                                 render_data.color);
 
-                DrawTriangleLines(vertices[0], vertices[1], vertices[2], BLACK);
-            } else
-            {
-                DrawCircleV(vertices[0], 10, RED);
+                    DrawCircleV(vertices[0], 1.4f, GREEN);
+                    DrawCircleV(vertices[1], 1.4f, RED);
+                    DrawCircleV(vertices[2], 1.6f, BLUE);
+
+                    DrawTriangleLines(vertices[0], vertices[1], vertices[2], BLACK);
+                    break;
+                }
+                case render_shape_type::CIRCLE: {
+                    auto radius = *static_cast<float*>(render_data.data);
+                    DrawCircleV(Vector2{0, 0}, radius, render_data.color);
+                    break;
+                }
             }
 
             rlPopMatrix();
