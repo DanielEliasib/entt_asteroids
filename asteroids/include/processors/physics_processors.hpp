@@ -22,6 +22,10 @@ struct physics_process : entt::process<physics_process, uint32_t>
         for (auto [entity, transform_data, physics_data] : physics_view.each())
         {
             physics_data.velocity = physics_data.velocity + physics_data.external_impulse * (delta_time / 1000.0f);
+            if (physics_data.drag > 0.0f)
+            {
+                physics_data.velocity = physics_data.velocity * (1.0f - physics_data.drag);
+            }
 
             transform_data.position = transform_data.position + physics_data.velocity * (delta_time / 1000.0f);
             transform_data.rotation = transform_data.rotation + physics_data.angular_velocity * (delta_time / 1000.0f);

@@ -15,7 +15,7 @@ void acceleration_input_command::execute(Vector2 input)
     {
         // TODO: Change this so it is generated automatically every frame
         Vector2 direction             = Vector2Transform(Vector2{1, 0}, MatrixRotateZ(transform_data.rotation * DEG2RAD));
-        physics_data.external_impulse = physics_data.external_impulse + direction * 100.0f;
+        physics_data.external_impulse = physics_data.external_impulse + direction * 120.0f;
     }
 }
 

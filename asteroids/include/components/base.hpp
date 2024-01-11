@@ -15,6 +15,8 @@ struct physics
     Vector2 velocity;
     float angular_velocity;
 
+	float drag;
+
     Vector2 external_force;
     Vector2 external_impulse;
 };

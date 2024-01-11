@@ -8,6 +8,7 @@
 #include <processors/physics_processors.hpp>
 #include <processors/render_processors.hpp>
 
+#include "processors/asteoirds_processors.hpp"
 #include "utils/input_handler.hpp"
 
 int main()
@@ -23,12 +24,14 @@ int main()
 
     entt::scheduler general_scheduler;
     general_scheduler.attach<physics_process>(registry);
+    general_scheduler.attach<asteroid_spawn_process>(registry);
 
     entt::scheduler render_scheduler;
     render_scheduler.attach<render_process>(registry);
     render_scheduler.attach<camera_process>(registry);
 
     create_player(registry, 0);
+    spawn_asteroid(registry, Vector2{0, 0}, Vector2{25, 0}, 3);
 
     input_handler input_handler(registry);
 
@@ -51,6 +54,7 @@ int main()
         BeginMode2D(camera);
 
         DrawText(TITLE, 10, 10, 20, text_color);
+        DrawText("Press [ESC] to exit", 10, 50, 10, text_color);
         DrawFPS(10, 30);
 
         render_scheduler.update(delta_time);

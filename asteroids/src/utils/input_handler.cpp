@@ -29,10 +29,11 @@ void input_handler::handle_input()
     {
         auto player_entity    = registry.view<Player, transform>().front();
         auto player_transform = registry.get<transform>(player_entity);
+        auto player_physics   = registry.get<physics>(player_entity);
 
         auto angle           = player_transform.rotation * DEG2RAD;
         auto direction       = Vector2{cos(angle), sin(angle)};
-        auto bullet_velocity = direction * 90.0f;
+        auto bullet_velocity = player_physics.velocity + direction * 320.0f;
         spawn_bullet(registry, player_transform.position, bullet_velocity);
     }
 
