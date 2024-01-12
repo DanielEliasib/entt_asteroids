@@ -1,6 +1,7 @@
 #include <player.hpp>
 
 #include "components/asteroid.hpp"
+#include "components/physics.hpp"
 #include "components/render.hpp"
 
 entt::entity create_player(entt::registry& registry, uint8_t id)
@@ -15,8 +16,16 @@ entt::entity create_player(entt::registry& registry, uint8_t id)
     return entity;
 }
 
-static std::unique_ptr<float> radius_ptr = std::make_unique<float>(1.5f);
+void on_bullet_collision(entt::registry& registry, entt::entity bullet_entity, entt::entity other_entity)
+{
+    if (!registry.all_of<asteroid>(other_entity))
+        return;
 
+    registry.destroy(bullet_entity);
+    registry.destroy(other_entity);
+}
+
+static std::unique_ptr<float> radius_ptr = std::make_unique<float>(1.5f);
 entt::entity spawn_bullet(entt::registry& registry, Vector2 position, Vector2 velocity)
 {
     entt::entity entity = registry.create();
@@ -30,6 +39,11 @@ entt::entity spawn_bullet(entt::registry& registry, Vector2 position, Vector2 ve
     registry.emplace<transform>(entity, transform{position, Vector2{0, 1}, angle});
     registry.emplace<physics>(entity, physics{velocity, 0, 0.0f, Vector2{0, 0}, Vector2{0, 0}});
     registry.emplace<shape_render>(entity, render_data);
+
+    circle_collider bullet_collider;
+    bullet_collider.radius = 1.5f;
+    bullet_collider.on_collision.connect<&on_bullet_collision>();
+    registry.emplace<circle_collider>(entity, bullet_collider);
 
     return entity;
 }
@@ -70,6 +84,10 @@ entt::entity spawn_asteroid(entt::registry& registry, Vector2 position, Vector2 
     registry.emplace<physics>(entity, physics{velocity, 0, 0.0f, Vector2{0, 0}, Vector2{0, 0}});
     registry.emplace<shape_render>(entity, render_data);
     registry.emplace<asteroid>(entity, asteroid{level});
+
+    circle_collider asteroid_collider;
+    asteroid_collider.radius = *radius;
+    registry.emplace<circle_collider>(entity, asteroid_collider);
 
     return entity;
 }

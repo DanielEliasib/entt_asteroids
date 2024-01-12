@@ -24,6 +24,8 @@ int main()
 
     entt::scheduler general_scheduler;
     general_scheduler.attach<physics_process>(registry);
+	general_scheduler.attach<collision_process>(registry);
+
     general_scheduler.attach<asteroid_spawn_process>(registry);
 
     entt::scheduler render_scheduler;
