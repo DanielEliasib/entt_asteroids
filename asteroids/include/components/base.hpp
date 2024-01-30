@@ -21,4 +21,9 @@ struct physics
     Vector2 external_impulse;
 };
 
+struct lifetime
+{
+	float radius;
+};
+
 #endif // BASE_DEFINITIONS_HPP

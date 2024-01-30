@@ -9,6 +9,7 @@
 #include <processors/render_processors.hpp>
 
 #include "processors/asteoirds_processors.hpp"
+#include "processors/base_processors.hpp"
 #include "utils/input_handler.hpp"
 
 int main()
@@ -23,8 +24,9 @@ int main()
     entt::registry registry;
 
     entt::scheduler general_scheduler;
+    general_scheduler.attach<lifetime_process>(registry);
     general_scheduler.attach<physics_process>(registry);
-	general_scheduler.attach<collision_process>(registry);
+    general_scheduler.attach<collision_process>(registry);
 
     general_scheduler.attach<asteroid_spawn_process>(registry);
 
@@ -33,7 +35,6 @@ int main()
     render_scheduler.attach<camera_process>(registry);
 
     create_player(registry, 0);
-    spawn_asteroid(registry, Vector2{0, 0}, Vector2{25, 0}, 3);
 
     input_handler input_handler(registry);
 

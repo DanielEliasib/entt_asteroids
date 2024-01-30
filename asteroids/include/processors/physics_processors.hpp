@@ -66,6 +66,10 @@ struct collision_process : entt::process<collision_process, uint32_t>
                 if (!collision_data.on_collision)
                     continue;
 
+                if (!registry.valid(entity) || !registry.valid(other_entity))
+                    continue;
+
+                std::cout << "Collision" << std::endl;
                 collision_data.on_collision(registry, entity, other_entity);
             }
         }
