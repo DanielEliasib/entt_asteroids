@@ -75,7 +75,7 @@ struct camera_process : entt::process<camera_process, std::uint32_t>
         auto& camera_data           = registry.get<Camera2D>(camera_entity);
         auto& player_transform_data = registry.get<transform>(player_entity);
 
-        camera_data.target = player_transform_data.position;
+        // camera_data.target = player_transform_data.position;
     }
 
    protected:

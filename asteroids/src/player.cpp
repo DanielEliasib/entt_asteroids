@@ -12,7 +12,7 @@ entt::entity create_player(entt::registry& registry, uint8_t id)
 {
     entt::entity entity = registry.create();
     registry.emplace<Player>(entity, Player{id});
-    registry.emplace<transform>(entity, transform{Vector2{400, 300}, Vector2{0, 1}, 0});
+    registry.emplace<transform>(entity, transform{Vector2{0, 0}, Vector2{0, 1}, 0});
     registry.emplace<physics>(entity, physics{Vector2{0, 0}, 0, 0.005f, Vector2{0, 0}, Vector2{0, 0}});
 
     add_render_data(registry, entity, WHITE);
@@ -88,7 +88,7 @@ entt::entity spawn_bullet(entt::registry& registry, Vector2 position, Vector2 ve
     registry.emplace<transform>(entity, transform{position, Vector2{0, 1}, angle});
     registry.emplace<physics>(entity, physics{velocity, 0, 0.0f, Vector2{0, 0}, Vector2{0, 0}});
     registry.emplace<shape_render>(entity, render_data);
-    registry.emplace<lifetime>(entity, lifetime{1500});
+    registry.emplace<lifetime>(entity, lifetime{2.5f, 0});
 
     circle_collider bullet_collider;
     bullet_collider.radius = 1.5f;
@@ -96,6 +96,22 @@ entt::entity spawn_bullet(entt::registry& registry, Vector2 position, Vector2 ve
     registry.emplace<circle_collider>(entity, bullet_collider);
 
     return entity;
+}
+
+void spawn_random_asteroid_distribution(entt::registry& registry, int count)
+{
+    for (int i = 0; i < count; i++)
+    {
+        float angle = GetRandomValue(0, 360);
+        float x     = GetRandomValue(20, GetScreenWidth() - 20);
+        float y     = GetRandomValue(20, GetScreenHeight() - 20);
+        float speed = GetRandomValue(100, 200);
+
+        Vector2 position = {x, y};
+        Vector2 velocity = Vector2Normalize(Vector2{cosf(angle * DEG2RAD), sinf(angle * DEG2RAD)}) * speed;
+
+        spawn_asteroid(registry, position, velocity, 3);
+    }
 }
 
 static std::unique_ptr<float> a_radius_2_ptr = std::make_unique<float>(50.0f);
@@ -139,7 +155,6 @@ entt::entity spawn_asteroid(entt::registry& registry, Vector2 position, Vector2 
     registry.emplace<physics>(entity, physics{velocity, 0, 0.0f, Vector2{0, 0}, Vector2{0, 0}});
     registry.emplace<shape_render>(entity, render_data);
     registry.emplace<asteroid>(entity, asteroid_data);
-    registry.emplace<lifetime>(entity, lifetime{5000});
 
     circle_collider asteroid_collider;
     asteroid_collider.radius = *radius;

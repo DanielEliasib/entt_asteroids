@@ -23,7 +23,8 @@ struct physics
 
 struct lifetime
 {
-	float radius;
+	float lifetime;
+	float elapsed;
 };
 
 #endif // BASE_DEFINITIONS_HPP

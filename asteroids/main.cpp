@@ -27,8 +27,9 @@ int main()
     general_scheduler.attach<lifetime_process>(registry);
     general_scheduler.attach<physics_process>(registry);
     general_scheduler.attach<collision_process>(registry);
+    general_scheduler.attach<boundary_process>(registry);
 
-    general_scheduler.attach<asteroid_spawn_process>(registry);
+    // general_scheduler.attach<asteroid_spawn_process>(registry);
 
     entt::scheduler render_scheduler;
     render_scheduler.attach<render_process>(registry);
@@ -41,6 +42,8 @@ int main()
     // Add a raylib camera
 
     spawn_main_camera(registry);
+
+    spawn_random_asteroid_distribution(registry, 4);
 
     while (!WindowShouldClose())
     {

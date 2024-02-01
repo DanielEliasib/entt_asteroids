@@ -41,5 +41,7 @@ void input_handler::handle_input()
     {
         auto mouse_position = GetMousePosition();
         mouse_moved->execute(mouse_position);
+
+		// DrawCircleV(mouse_position, 5, RED);
     }
 }
