@@ -29,10 +29,9 @@ int main()
     general_scheduler.attach<collision_process>(registry);
     general_scheduler.attach<boundary_process>(registry);
 
-    // general_scheduler.attach<asteroid_spawn_process>(registry);
-
     entt::scheduler render_scheduler;
     render_scheduler.attach<render_process>(registry);
+    render_scheduler.attach<ui_process>(registry);
     render_scheduler.attach<camera_process>(registry);
 
     create_player(registry, 0);

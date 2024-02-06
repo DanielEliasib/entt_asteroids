@@ -11,8 +11,17 @@
 entt::entity create_player(entt::registry& registry, uint8_t id)
 {
     entt::entity entity = registry.create();
-    registry.emplace<Player>(entity, Player{id});
-    registry.emplace<transform>(entity, transform{Vector2{0, 0}, Vector2{0, 1}, 0});
+
+    int screenWidth  = GetScreenWidth();
+    int screenHeight = GetScreenHeight();
+
+    registry.emplace<Player>(entity, Player{id, 0});
+    registry.emplace<transform>(
+        entity,
+        transform{
+            // Vector2{100, 100},
+            Vector2{screenWidth * 0.5f, screenHeight * 0.5f},
+            Vector2{0, 1}, 0});
     registry.emplace<physics>(entity, physics{Vector2{0, 0}, 0, 0.005f, Vector2{0, 0}, Vector2{0, 0}});
 
     add_render_data(registry, entity, WHITE);
@@ -27,30 +36,56 @@ void on_bullet_collision(entt::registry& registry, entt::entity bullet_entity, e
         return;
 
     auto bullet_physics = registry.get<physics>(bullet_entity);
+    auto asteroid_data  = registry.get<asteroid>(other_entity);
+
+    if (registry.valid(other_entity))
+    {
+        asteroid_data.on_asteroid_death(registry, other_entity, Vector2Normalize(bullet_physics.velocity), asteroid_data.level - 1);
+    }
 
     if (registry.valid(bullet_entity))
     {
         registry.destroy(bullet_entity);
     }
+}
 
-    std::cout << "Bullet collision with asteroid" << std::endl;
+void on_player_score(entt::registry& registry, entt::entity asteroid_entity, Vector2 normalizedDirection, int8_t level)
+{
+    uint32_t score = 0;
+    switch (level)
+    {
+        case 0:
+            score = 100;
+            break;
+        case 1:
+            score = 50;
+            break;
+        case 2:
+            score = 20;
+            break;
+        default:
+            score = 200;
+            break;
+    }
 
-    auto asteroid_data = registry.get<asteroid>(other_entity);
-    asteroid_data.on_asteroid_death(registry, other_entity, Vector2Normalize(bullet_physics.velocity), asteroid_data.level - 1);
+    auto player_view   = registry.view<Player>();
+    auto player_entity = player_view.front();
+
+    if (!registry.valid(player_entity))
+        return;
+
+    auto& player_data = player_view.get<Player>(player_entity);
+
+    player_data.score += score;
 }
 
 void on_asteroid_break(entt::registry& registry, entt::entity asteroid_entity, Vector2 normalizedDirection, int8_t level)
 {
-    std::cout << "Asteroid break" << std::endl;
+    on_player_score(registry, asteroid_entity, normalizedDirection, level);
+
     if (level <= 0)
     {
-        std::cout << "Asteroid break level 0" << std::endl;
-
-        if (registry.valid(asteroid_entity))
-        {
-            registry.destroy(asteroid_entity);
-        }
-
+        registry.destroy(asteroid_entity);
         return;
     }
 

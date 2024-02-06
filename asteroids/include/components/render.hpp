@@ -45,8 +45,11 @@ inline static void spawn_main_camera(entt::registry& registry)
 {
     entt::entity entity = registry.create();
 
+    int screenWidth  = GetScreenWidth();
+    int screenHeight = GetScreenHeight();
+
     Camera2D camera;
-    camera.target   = {0, 0};
+    camera.target   = Vector2{screenWidth * 0.5f, screenHeight * 0.5f};
     camera.offset   = {static_cast<float>(GetScreenWidth() / 2), static_cast<float>(GetScreenHeight() / 2)};
     camera.rotation = 0.0f;
     camera.zoom     = 1.0f;
