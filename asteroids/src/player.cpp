@@ -8,6 +8,33 @@
 #include "math.hpp"
 #include "raymath.h"
 
+void on_player_collision(entt::registry& registry, entt::entity player_entity, entt::entity other_entity)
+{
+    std::cout << "Player collision" << std::endl;
+    if (!registry.all_of<asteroid>(other_entity))
+        return;
+
+    auto player_physics = registry.get<physics>(player_entity);
+    auto asteroid_data  = registry.get<asteroid>(other_entity);
+
+    if (registry.valid(other_entity))
+    {
+        asteroid_data.on_asteroid_death(registry, other_entity, Vector2Normalize(player_physics.velocity), asteroid_data.level - 1);
+    }
+
+    if (registry.valid(player_entity))
+    {
+        auto& player_data = registry.get<Player>(player_entity);
+        player_data.lives -= 1;
+
+        if (player_data.lives <= 0)
+        {
+            registry.destroy(player_entity);
+            return;
+        }
+    }
+}
+
 entt::entity create_player(entt::registry& registry, uint8_t id)
 {
     entt::entity entity = registry.create();
@@ -15,7 +42,11 @@ entt::entity create_player(entt::registry& registry, uint8_t id)
     int screenWidth  = GetScreenWidth();
     int screenHeight = GetScreenHeight();
 
-    registry.emplace<Player>(entity, Player{id, 0});
+    circle_collider player_collider;
+    player_collider.radius = 10;
+    player_collider.on_collision.connect<&on_player_collision>();
+
+    registry.emplace<Player>(entity, Player{id, 0, 3});
     registry.emplace<transform>(
         entity,
         transform{
@@ -23,6 +54,7 @@ entt::entity create_player(entt::registry& registry, uint8_t id)
             Vector2{screenWidth * 0.5f, screenHeight * 0.5f},
             Vector2{0, 1}, 0});
     registry.emplace<physics>(entity, physics{Vector2{0, 0}, 0, 0.005f, Vector2{0, 0}, Vector2{0, 0}});
+    registry.emplace<circle_collider>(entity, player_collider);
 
     add_render_data(registry, entity, WHITE);
 

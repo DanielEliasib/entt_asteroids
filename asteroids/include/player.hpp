@@ -11,7 +11,8 @@
 struct Player
 {
     uint8_t id; // INFO: dummy data for now
-	uint32_t score;
+    uint32_t score;
+    uint8_t lives;
 };
 
 entt::entity create_player(entt::registry& registry, uint8_t id);

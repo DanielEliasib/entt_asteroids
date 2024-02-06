@@ -27,7 +27,11 @@ void input_handler::handle_input()
 
     if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) && acceleration_button_pressed != nullptr)
     {
-        auto player_entity    = registry.view<Player, transform>().front();
+        auto player_entity = registry.view<Player, transform>().front();
+
+        if (!registry.valid(player_entity))
+            return;
+
         auto player_transform = registry.get<transform>(player_entity);
         auto player_physics   = registry.get<physics>(player_entity);
 
@@ -42,6 +46,6 @@ void input_handler::handle_input()
         auto mouse_position = GetMousePosition();
         mouse_moved->execute(mouse_position);
 
-		// DrawCircleV(mouse_position, 5, RED);
+        // DrawCircleV(mouse_position, 5, RED);
     }
 }

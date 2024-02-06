@@ -32,7 +32,7 @@ int main()
     entt::scheduler render_scheduler;
     render_scheduler.attach<render_process>(registry);
     render_scheduler.attach<ui_process>(registry);
-    render_scheduler.attach<camera_process>(registry);
+    // render_scheduler.attach<camera_process>(registry);
 
     create_player(registry, 0);
 

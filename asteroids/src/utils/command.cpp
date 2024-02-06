@@ -21,13 +21,16 @@ void acceleration_input_command::execute(Vector2 input)
 
 void mouse_input_command::execute(Vector2 input)
 {
-	// PERF: Maybe some of these entities should be cached
+    // PERF: Maybe some of these entities should be cached
     auto physics_view = registry.view<Player, physics, transform>();
     auto camera_view  = registry.view<Camera2D>();
     auto player_view  = registry.view<Player, transform>();
 
     auto player_entity = player_view.front();
     auto camera_entity = camera_view.front();
+
+    if (!registry.valid(player_entity) || !registry.valid(camera_entity))
+        return;
 
     auto player_transform = player_view.get<transform>(player_entity);
     auto camera_data      = camera_view.get<Camera2D>(camera_entity);

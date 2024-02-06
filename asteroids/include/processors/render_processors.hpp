@@ -28,9 +28,13 @@ struct ui_process : entt::process<ui_process, std::uint32_t>
             return;
         }
 
-        auto player_data = registry.get<Player>(player_entity);
+        auto player_data      = registry.get<Player>(player_entity);
+        auto player_transform = registry.get<transform>(player_entity);
 
         DrawText(TextFormat("Score: %i", player_data.score), 10, 70, 20, WHITE);
+        DrawText(TextFormat("Lives: %i", player_data.lives), 10, 90, 20, WHITE);
+
+        // DrawCircleLinesV(player_transform.position, 10, RED);
     }
 
    protected:
