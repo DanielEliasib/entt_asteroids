@@ -1,7 +1,6 @@
 #ifndef MATH_HPP
 #define MATH_HPP
 
-#include <raylib.h>
 #include <raymath.h>
 
 Vector2 operator+(const Vector2& lhs, const Vector2& rhs);

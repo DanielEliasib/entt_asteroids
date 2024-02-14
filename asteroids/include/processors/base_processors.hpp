@@ -1,13 +1,12 @@
 #ifndef BASE_PROCESSORS_HPP
 #define BASE_PROCESSORS_HPP
 
+#include <raylib.h>
+
 #include <entt/entt.hpp>
-#include <iostream>
 
 #include "components/base.hpp"
-#include "player.hpp"
-#include "raylib.h"
-#include "raymath.h"
+
 
 struct lifetime_process : entt::process<lifetime_process, std::uint32_t>
 {

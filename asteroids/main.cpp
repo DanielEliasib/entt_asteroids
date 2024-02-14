@@ -2,13 +2,12 @@
 #include <raymath.h>
 #include <rlgl.h>
 
-#include <iostream>
 #include <math.hpp>
-#include <player.hpp>
+#include <components/player.hpp>
 #include <processors/physics_processors.hpp>
 #include <processors/render_processors.hpp>
 
-#include "processors/asteoirds_processors.hpp"
+#include "components/asteroid.hpp"
 #include "processors/base_processors.hpp"
 #include "utils/input_handler.hpp"
 

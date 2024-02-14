@@ -1,7 +1,7 @@
 #ifndef BASE_DEFINITIONS_HPP
 #define BASE_DEFINITIONS_HPP
 
-#include <raylib.h>
+#include <raymath.h>
 
 struct transform
 {

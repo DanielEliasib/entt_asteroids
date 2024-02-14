@@ -25,6 +25,15 @@ struct sprite_render
 	float scale;
 };
 
+entt::entity LoadTexture(const char* path, entt::registry& registry )
+{
+	Texture2D texture = LoadTexture(path);
+	entt::entity entity = registry.create();
+	registry.emplace<Texture2D>(entity, texture);
+
+	return entity;
+}
+
 static std::vector<Vector2>* original_triangle = nullptr;
 inline static void add_render_data(entt::registry& registry, entt::entity entity, Color color)
 {

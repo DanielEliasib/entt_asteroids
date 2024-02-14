@@ -1,12 +1,10 @@
 #ifndef ASTEROIDS_PROCESSORS_HPP
 #define ASTEROIDS_PROCESSORS_HPP
 
-#include <entt/entt.hpp>
-#include <iostream>
+#include <raylib.h>
 
-#include "math.hpp"
-#include "player.hpp"
-#include "raylib.h"
+#include <entt/entt.hpp>
+
 
 struct asteroid_spawn_process : entt::process<asteroid_spawn_process, std::uint32_t>
 {

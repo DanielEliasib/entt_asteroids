@@ -7,10 +7,8 @@
 #include <components/base.hpp>
 #include <components/render.hpp>
 #include <entt/entt.hpp>
-#include <iostream>
-#include <variant>
 
-#include "player.hpp"
+#include "components/player.hpp"
 
 struct ui_process : entt::process<ui_process, std::uint32_t>
 {

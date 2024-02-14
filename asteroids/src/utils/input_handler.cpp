@@ -3,7 +3,7 @@
 #include <math.hpp>
 #include <utils/input_handler.hpp>
 
-#include "player.hpp"
+#include "components/player.hpp"
 #include "raymath.h"
 
 input_handler::input_handler(entt::registry& registry) :
@@ -28,7 +28,7 @@ void input_handler::handle_input()
 
     if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) && acceleration_button_pressed != nullptr)
     {
-		shoot_button_pressed->execute(Vector2Zero());
+        shoot_button_pressed->execute(Vector2Zero());
     }
 
     if (mouse_moved != nullptr)

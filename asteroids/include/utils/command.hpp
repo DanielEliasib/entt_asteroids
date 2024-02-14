@@ -1,10 +1,14 @@
 #ifndef COMMAND_HPP
 #define COMMAND_HPP
 
+#include <raylib.h>
+
 #include <chrono>
 #include <entt/entt.hpp>
 
-#include "player.hpp"
+#include "components/base.hpp"
+#include "components/player.hpp"
+
 
 struct Vector2;
 
@@ -44,7 +48,7 @@ class shoot_input_command : public command {
             _player_entity = player_entity;
         }
 
-		_cooldown = _short_cooldown;
+        _cooldown = _short_cooldown;
     }
     void execute(Vector2 input) override;
 
@@ -52,14 +56,13 @@ class shoot_input_command : public command {
     entt::entity _player_entity = entt::null;
     std::chrono::high_resolution_clock::time_point _last_shot_time;
 
-	uint16_t _shots_fired = 0;
-	uint16_t _max_shots = 3;
+    uint16_t _shots_fired = 0;
+    uint16_t _max_shots   = 3;
 
-	uint16_t _cooldown = 0;
+    uint16_t _cooldown = 0;
 
-	uint16_t _short_cooldown = 150;
-	uint16_t _long_cooldown = 800;
-
+    uint16_t _short_cooldown = 150;
+    uint16_t _long_cooldown  = 800;
 };
 
 #endif // COMMAND_HPP
