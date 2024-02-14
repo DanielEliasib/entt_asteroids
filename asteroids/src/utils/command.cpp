@@ -46,3 +46,47 @@ void mouse_input_command::execute(Vector2 input)
         transform_data.rotation = angle;
     }
 }
+
+void shoot_input_command::execute(Vector2 input)
+{
+	if (!registry.valid(_player_entity))
+		return;
+
+	auto now = std::chrono::high_resolution_clock::now();
+
+	auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now - _last_shot_time).count();
+
+	if (duration_ms < _cooldown)
+	{
+		return;
+	}
+
+	if (duration_ms > _long_cooldown)
+	{
+		_shots_fired = 0;
+	}
+
+	if (_cooldown == _long_cooldown)
+	{
+		_cooldown = _short_cooldown;
+	}
+
+    auto player_transform = registry.get<transform>(_player_entity);
+    auto player_physics   = registry.get<physics>(_player_entity);
+
+    auto angle           = player_transform.rotation * DEG2RAD;
+    auto direction       = Vector2{cos(angle), sin(angle)};
+    auto bullet_velocity = player_physics.velocity + direction * 320.0f;
+    spawn_bullet(registry, player_transform.position, bullet_velocity);
+
+	_shots_fired++;
+
+	if (_shots_fired >= _max_shots)
+	{
+		_shots_fired = 0;
+
+		_cooldown = _long_cooldown;
+	}
+
+	_last_shot_time = now;
+}
