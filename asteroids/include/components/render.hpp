@@ -18,6 +18,13 @@ struct shape_render
     void* data;
 };
 
+struct sprite_render
+{
+	Texture2D texture;
+	Rectangle source;
+	float scale;
+};
+
 static std::vector<Vector2>* original_triangle = nullptr;
 inline static void add_render_data(entt::registry& registry, entt::entity entity, Color color)
 {

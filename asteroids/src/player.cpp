@@ -6,6 +6,7 @@
 #include "components/physics.hpp"
 #include "components/render.hpp"
 #include "math.hpp"
+#include "raylib.h"
 #include "raymath.h"
 
 void on_player_collision(entt::registry& registry, entt::entity player_entity, entt::entity other_entity)
@@ -56,7 +57,11 @@ entt::entity create_player(entt::registry& registry, uint8_t id)
     registry.emplace<physics>(entity, physics{Vector2{0, 0}, 0, 0.005f, Vector2{0, 0}, Vector2{0, 0}});
     registry.emplace<circle_collider>(entity, player_collider);
 
-    add_render_data(registry, entity, WHITE);
+	float scale = player_collider.radius * 2 / 96.0f;
+	Texture tilesheet = LoadTexture("asteroids/resources/simpleSpace_tilesheet.png");
+	registry.emplace<sprite_render>(entity, sprite_render{tilesheet, Rectangle{528, 16, 96, 96}, scale});
+	
+    // add_render_data(registry, entity, WHITE);
 
     return entity;
 }

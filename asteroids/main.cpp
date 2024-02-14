@@ -30,7 +30,8 @@ int main()
     general_scheduler.attach<boundary_process>(registry);
 
     entt::scheduler render_scheduler;
-    render_scheduler.attach<render_process>(registry);
+	render_scheduler.attach<sprite_render_process>(registry);
+    render_scheduler.attach<shape_render_process>(registry);
     render_scheduler.attach<ui_process>(registry);
     // render_scheduler.attach<camera_process>(registry);
 

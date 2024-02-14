@@ -41,11 +41,11 @@ struct ui_process : entt::process<ui_process, std::uint32_t>
     entt::registry& registry;
 };
 
-struct render_process : entt::process<render_process, std::uint32_t>
+struct shape_render_process : entt::process<shape_render_process, std::uint32_t>
 {
     using delta_type = std::uint32_t;
 
-    render_process(entt::registry& registry) :
+    shape_render_process(entt::registry& registry) :
         registry(registry) {}
 
     void update(delta_type delta_time, void*)
@@ -80,6 +80,45 @@ struct render_process : entt::process<render_process, std::uint32_t>
                     break;
                 }
             }
+
+            rlPopMatrix();
+        }
+    }
+
+   protected:
+    entt::registry& registry;
+};
+
+struct sprite_render_process : entt::process<sprite_render_process, std::uint32_t>
+{
+    using delta_type = std::uint32_t;
+
+    sprite_render_process(entt::registry& registry) :
+        registry(registry) {}
+
+    void update(delta_type delta_time, void*)
+    {
+        auto render_view = registry.view<transform, sprite_render>();
+
+        for (auto [entity, transform_data, render_data] : render_view.each())
+        {
+            if (!IsTextureReady(render_data.texture))
+            {
+                continue;
+            }
+
+            rlPushMatrix();
+            rlTranslatef(transform_data.position.x, transform_data.position.y, 0.0f);
+            rlRotatef(transform_data.rotation, 0.0f, 0.0f, 1.0f);
+
+            DrawTexturePro(
+                render_data.texture,
+                render_data.source,
+                Rectangle{
+                    0,
+                    0,
+                    render_data.source.width * render_data.scale, render_data.source.height * render_data.scale},
+                Vector2{render_data.source.width * render_data.scale / 2, render_data.source.height * render_data.scale/ 2}, 90, WHITE);
 
             rlPopMatrix();
         }
