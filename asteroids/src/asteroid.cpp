@@ -10,7 +10,6 @@
 #include "components/player.hpp"
 #include "math.hpp"
 
-
 void spawn_random_asteroid_distribution(entt::registry& registry, int count)
 {
     for (int i = 0; i < count; i++)
@@ -92,7 +91,17 @@ static std::unique_ptr<float> a_radius_1_ptr = std::make_unique<float>(25.0f);
 static std::unique_ptr<float> a_radius_0_ptr = std::make_unique<float>(10.0f);
 entt::entity spawn_asteroid(entt::registry& registry, Vector2 position, Vector2 velocity, int8_t level)
 {
-    auto level_radius = [](int8_t level) {
+    static const auto make_rectangle_source = [](int8_t level, float sprite_size) {
+        if (level >= 3)
+        {
+            return Rectangle{16, 528, sprite_size, sprite_size};
+        } else
+        {
+            return Rectangle{160, 544, sprite_size, sprite_size};
+        }
+    };
+
+    static const auto level_radius = [](int8_t level) {
         if (level >= 3)
         {
             return a_radius_2_ptr.get();
@@ -103,6 +112,16 @@ entt::entity spawn_asteroid(entt::registry& registry, Vector2 position, Vector2 
         {
             return a_radius_0_ptr.get();
         }
+    };
+
+    static const auto random_color = []() {
+        static const std::array<Color, 5> colors = {
+            Color{224, 229, 231, 255},
+            Color{220, 222, 227, 255},
+            Color{233, 238, 240, 255},
+        };
+
+        return colors[GetRandomValue(0, 2)];
     };
 
     if (level <= 0)
@@ -126,12 +145,20 @@ entt::entity spawn_asteroid(entt::registry& registry, Vector2 position, Vector2 
 
     registry.emplace<transform>(entity, transform{position, Vector2{0, 1}, angle});
     registry.emplace<physics>(entity, physics{velocity, 0, 0.0f, Vector2{0, 0}, Vector2{0, 0}});
-    registry.emplace<shape_render>(entity, render_data);
     registry.emplace<asteroid>(entity, asteroid_data);
 
     circle_collider asteroid_collider;
     asteroid_collider.radius = *radius;
     registry.emplace<circle_collider>(entity, asteroid_collider);
+
+    float sprite_size = level < 3 ? 64 : 96;
+    float scale       = asteroid_collider.radius * 2 / sprite_size;
+    Rectangle source  = make_rectangle_source(level, sprite_size);
+
+    auto texture_entity = registry.view<Texture2D>().front();
+    Texture2D tilesheet = registry.get<Texture2D>(texture_entity);
+
+    registry.emplace<sprite_render>(entity, sprite_render{tilesheet, source, scale, random_color()});
 
     return entity;
 }

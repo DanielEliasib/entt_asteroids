@@ -2,12 +2,13 @@
 #include <raymath.h>
 #include <rlgl.h>
 
-#include <math.hpp>
 #include <components/player.hpp>
+#include <math.hpp>
 #include <processors/physics_processors.hpp>
 #include <processors/render_processors.hpp>
 
 #include "components/asteroid.hpp"
+#include "components/render.hpp"
 #include "processors/base_processors.hpp"
 #include "utils/input_handler.hpp"
 
@@ -29,11 +30,12 @@ int main()
     general_scheduler.attach<boundary_process>(registry);
 
     entt::scheduler render_scheduler;
-	render_scheduler.attach<sprite_render_process>(registry);
+    render_scheduler.attach<sprite_render_process>(registry);
     render_scheduler.attach<shape_render_process>(registry);
     render_scheduler.attach<ui_process>(registry);
     // render_scheduler.attach<camera_process>(registry);
 
+    LoadTextureToEntity("asteroids/resources/simpleSpace_tilesheet.png", registry);
     create_player(registry, 0);
 
     input_handler input_handler(registry);

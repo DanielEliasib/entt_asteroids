@@ -116,7 +116,7 @@ struct sprite_render_process : entt::process<sprite_render_process, std::uint32_
                     0,
                     0,
                     render_data.source.width * render_data.scale, render_data.source.height * render_data.scale},
-                Vector2{render_data.source.width * render_data.scale / 2, render_data.source.height * render_data.scale/ 2}, 90, WHITE);
+                Vector2{render_data.source.width * render_data.scale / 2, render_data.source.height * render_data.scale/ 2}, 90, render_data.tint);
 
             rlPopMatrix();
         }

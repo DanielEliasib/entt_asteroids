@@ -20,18 +20,28 @@ struct shape_render
 
 struct sprite_render
 {
-	Texture2D texture;
-	Rectangle source;
-	float scale;
+    Texture2D texture;
+    Rectangle source;
+    float scale = 1.0f;
+	Color tint = WHITE;
 };
 
-entt::entity LoadTexture(const char* path, entt::registry& registry )
-{
-	Texture2D texture = LoadTexture(path);
-	entt::entity entity = registry.create();
-	registry.emplace<Texture2D>(entity, texture);
+class TestClass {
+   public:
+    TestClass(int a, int b) :
+        a(a), b(b) {}
+    int a;
+    int b;
+};
 
-	return entity;
+static entt::entity LoadTextureToEntity(const char* path, entt::registry& registry)
+{
+	// TODO: Add an ID per texture
+    Texture2D texture   = LoadTexture(path);
+    entt::entity entity = registry.create();
+    registry.emplace<Texture2D>(entity, texture);
+
+    return entity;
 }
 
 static std::vector<Vector2>* original_triangle = nullptr;

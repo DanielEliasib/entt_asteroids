@@ -59,11 +59,12 @@ entt::entity create_player(entt::registry& registry, uint8_t id)
     registry.emplace<physics>(entity, physics{Vector2{0, 0}, 0, 0.005f, Vector2{0, 0}, Vector2{0, 0}});
     registry.emplace<circle_collider>(entity, player_collider);
 
-    float scale       = player_collider.radius * 2 / 96.0f;
-    Texture tilesheet = LoadTexture("asteroids/resources/simpleSpace_tilesheet.png");
-    registry.emplace<sprite_render>(entity, sprite_render{tilesheet, Rectangle{528, 16, 96, 96}, scale});
+    float scale = player_collider.radius * 2 / 96.0f;
 
-    // add_render_data(registry, entity, WHITE);
+    auto texture_entity = registry.view<Texture2D>().front();
+    Texture2D tilesheet = registry.get<Texture2D>(texture_entity);
+
+    registry.emplace<sprite_render>(entity, sprite_render{tilesheet, Rectangle{528, 16, 96, 96}, scale});
 
     return entity;
 }
@@ -101,13 +102,20 @@ entt::entity spawn_bullet(entt::registry& registry, Vector2 position, Vector2 ve
 
     registry.emplace<transform>(entity, transform{position, Vector2{0, 1}, angle});
     registry.emplace<physics>(entity, physics{velocity, 0, 0.0f, Vector2{0, 0}, Vector2{0, 0}});
-    registry.emplace<shape_render>(entity, render_data);
+    // registry.emplace<shape_render>(entity, render_data);
     registry.emplace<lifetime>(entity, lifetime{2.5f, 0});
 
     circle_collider bullet_collider;
-    bullet_collider.radius = 1.5f;
+    bullet_collider.radius = 2.5f;
     bullet_collider.on_collision.connect<&on_bullet_collision>();
     registry.emplace<circle_collider>(entity, bullet_collider);
+
+    float scale = bullet_collider.radius * 2 / 32.0f;
+
+    auto texture_entity = registry.view<Texture2D>().front();
+    Texture2D tilesheet = registry.get<Texture2D>(texture_entity);
+
+    registry.emplace<sprite_render>(entity, sprite_render{tilesheet, Rectangle{560, 432, 32, 32}, scale, RED});
 
     return entity;
 }
