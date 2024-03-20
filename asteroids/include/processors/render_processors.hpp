@@ -7,6 +7,8 @@
 #include <components/base.hpp>
 #include <components/render.hpp>
 #include <entt/entt.hpp>
+#include <iomanip>
+#include <sstream>
 
 #include "components/player.hpp"
 
@@ -16,6 +18,20 @@ struct ui_process : entt::process<ui_process, std::uint32_t>
 
     ui_process(entt::registry& registry) :
         registry(registry) {}
+
+    std::string lives_to_string(int lives)
+    {
+        std::ostringstream ss;
+
+        for (int i = 0; i < lives; i++)
+        {
+            ss << "X";
+        }
+
+        ss << std::setw(3) << std::setfill(' ');
+
+        return ss.str();
+    }
 
     void update(delta_type delta_time, void*)
     {
@@ -29,8 +45,23 @@ struct ui_process : entt::process<ui_process, std::uint32_t>
         auto player_data      = registry.get<Player>(player_entity);
         auto player_transform = registry.get<transform>(player_entity);
 
-        DrawText(TextFormat("Score: %i", player_data.score), 10, 70, 20, WHITE);
-        DrawText(TextFormat("Lives: %i", player_data.lives), 10, 90, 20, WHITE);
+        int width = GetScreenWidth();
+		const int fontSize = 30;
+
+        auto score = TextFormat("%05i", player_data.score);
+        auto lives = lives_to_string(player_data.lives).c_str();
+
+        int text_size = MeasureText(score, fontSize);
+
+        int posX = width / 2 - (text_size) / 2;
+
+        DrawText(score,
+                 posX, 10, fontSize, WHITE);
+
+        text_size = MeasureText(lives, fontSize);
+        posX      = width / 2 - (text_size) / 2;
+        DrawText(lives,
+                 posX, 40, fontSize, WHITE);
 
         // DrawCircleLinesV(player_transform.position, 10, RED);
     }
@@ -116,7 +147,7 @@ struct sprite_render_process : entt::process<sprite_render_process, std::uint32_
                     0,
                     0,
                     render_data.source.width * render_data.scale, render_data.source.height * render_data.scale},
-                Vector2{render_data.source.width * render_data.scale / 2, render_data.source.height * render_data.scale/ 2}, 90, render_data.tint);
+                Vector2{render_data.source.width * render_data.scale / 2, render_data.source.height * render_data.scale / 2}, 90, render_data.tint);
 
             rlPopMatrix();
         }

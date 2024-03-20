@@ -23,7 +23,7 @@ struct sprite_render
     Texture2D texture;
     Rectangle source;
     float scale = 1.0f;
-	Color tint = WHITE;
+    Color tint  = WHITE;
 };
 
 class TestClass {
@@ -34,9 +34,19 @@ class TestClass {
     int b;
 };
 
+static entt::entity LoadFontToEntity(const char* path, entt::registry& registry)
+{
+    Font font = LoadFont(path);
+
+    entt::entity entity = registry.create();
+    registry.emplace<Font>(entity, font);
+
+    return entity;
+}
+
 static entt::entity LoadTextureToEntity(const char* path, entt::registry& registry)
 {
-	// TODO: Add an ID per texture
+    // TODO: Add an ID per texture
     Texture2D texture   = LoadTexture(path);
     entt::entity entity = registry.create();
     registry.emplace<Texture2D>(entity, texture);

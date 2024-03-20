@@ -15,7 +15,7 @@
 int main()
 {
     const char* TITLE = "ASTEROIDS";
-    InitWindow(800, 600, TITLE);
+    InitWindow(800, 800, TITLE);
     SetTargetFPS(60);
 
     Color background_color = {15, 15, 15, 255};
@@ -60,9 +60,9 @@ int main()
         Camera2D camera = registry.get<Camera2D>(registry.view<Camera2D>().front());
         BeginMode2D(camera);
 
-        DrawText(TITLE, 10, 10, 20, text_color);
-        DrawText("Press [ESC] to exit", 10, 50, 10, text_color);
-        DrawFPS(10, 30);
+        // DrawText(TITLE, 10, 10, 20, text_color);
+        // DrawText("Press [ESC] to exit", 10, 50, 10, text_color);
+        // DrawFPS(10, 30);
 
         render_scheduler.update(delta_time);
 
