@@ -124,6 +124,8 @@ entt::entity spawn_asteroid(entt::registry& registry, Vector2 position, Vector2 
         return colors[GetRandomValue(0, 2)];
     };
 
+    static const std::uint32_t texture_tag = static_cast<std::uint32_t>(GAME_TEXTURES::MAINTEXTURE);
+
     if (level <= 0)
     {
         std::cout << "Spawn invalid asteroid" << std::endl;
@@ -155,7 +157,7 @@ entt::entity spawn_asteroid(entt::registry& registry, Vector2 position, Vector2 
     float scale       = asteroid_collider.radius * 2 / sprite_size;
     Rectangle source  = make_rectangle_source(level, sprite_size);
 
-    auto texture_entity = registry.view<Texture2D>().front();
+    auto texture_entity = registry.view<Texture2D, entt::tag<texture_tag>>().front();
     Texture2D tilesheet = registry.get<Texture2D>(texture_entity);
 
     registry.emplace<sprite_render>(entity, sprite_render{tilesheet, source, scale, random_color()});

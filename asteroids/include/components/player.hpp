@@ -18,4 +18,6 @@ struct Player
 entt::entity create_player(entt::registry& registry, uint8_t id);
 
 entt::entity spawn_bullet(entt::registry& registry, Vector2 position, Vector2 velocity);
+
+entt::entity spawn_explosion(entt::registry& registry, Vector2 position, float scale);
 #endif // PLAYER_HPP

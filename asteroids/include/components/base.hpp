@@ -1,7 +1,15 @@
 #ifndef BASE_DEFINITIONS_HPP
 #define BASE_DEFINITIONS_HPP
 
-#include <raymath.h>
+#include <raylib.h>
+
+#include <cstddef>
+#include <cstdint>
+#include <entt/entt.hpp>
+#include <functional>
+#include <string_view>
+
+using entt::operator""_hs;
 
 struct transform
 {
@@ -15,7 +23,7 @@ struct physics
     Vector2 velocity;
     float angular_velocity;
 
-	float drag;
+    float drag;
 
     Vector2 external_force;
     Vector2 external_impulse;
@@ -23,8 +31,13 @@ struct physics
 
 struct lifetime
 {
-	float lifetime;
-	float elapsed;
+    float lifetime;
+    float elapsed;
 };
 
+enum class GAME_TEXTURES : std::uint32_t {
+    MAINTEXTURE  = "MAINTEX"_hs,
+    PLANETEXTURE = "EXPTEX"_hs
+
+};
 #endif // BASE_DEFINITIONS_HPP

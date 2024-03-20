@@ -1,8 +1,11 @@
 #ifndef RENDER_HPP
 #define RENDER_HPP
 
+#include <array>
+#include <cstdint>
 #include <entt/entt.hpp>
 
+#include "base.hpp"
 #include "raylib.h"
 
 enum class render_shape_type
@@ -26,12 +29,24 @@ struct sprite_render
     Color tint  = WHITE;
 };
 
-class TestClass {
-   public:
-    TestClass(int a, int b) :
-        a(a), b(b) {}
-    int a;
-    int b;
+struct sprite_frame
+{
+    Rectangle source;
+};
+
+struct sprite_sequence
+{
+    sprite_frame* frames;
+    sprite_frame* first_frame;
+
+    bool loop;
+    bool update;
+
+    int frame_count;
+    int current_frame;
+
+    float frame_time;
+    float current_delta;
 };
 
 static entt::entity LoadFontToEntity(const char* path, entt::registry& registry)
@@ -44,12 +59,15 @@ static entt::entity LoadFontToEntity(const char* path, entt::registry& registry)
     return entity;
 }
 
+template<const GAME_TEXTURES val>
 static entt::entity LoadTextureToEntity(const char* path, entt::registry& registry)
 {
-    // TODO: Add an ID per texture
-    Texture2D texture   = LoadTexture(path);
+    Texture2D texture = LoadTexture(path);
+
     entt::entity entity = registry.create();
+
     registry.emplace<Texture2D>(entity, texture);
+    registry.emplace<entt::tag<static_cast<std::uint32_t>(val)>>(entity);
 
     return entity;
 }

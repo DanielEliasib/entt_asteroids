@@ -45,8 +45,8 @@ struct ui_process : entt::process<ui_process, std::uint32_t>
         auto player_data      = registry.get<Player>(player_entity);
         auto player_transform = registry.get<transform>(player_entity);
 
-        int width = GetScreenWidth();
-		const int fontSize = 30;
+        int width          = GetScreenWidth();
+        const int fontSize = 30;
 
         auto score = TextFormat("%05i", player_data.score);
         auto lives = lives_to_string(player_data.lives).c_str();
@@ -150,6 +150,54 @@ struct sprite_render_process : entt::process<sprite_render_process, std::uint32_
                 Vector2{render_data.source.width * render_data.scale / 2, render_data.source.height * render_data.scale / 2}, 90, render_data.tint);
 
             rlPopMatrix();
+        }
+    }
+
+   protected:
+    entt::registry& registry;
+};
+
+struct sprite_sequence_process : entt::process<sprite_sequence_process, std::uint32_t>
+{
+    using delta_type = std::uint32_t;
+
+    sprite_sequence_process(entt::registry& registry) :
+        registry(registry) {}
+
+    void update(delta_type delta_time, void*)
+    {
+        auto render_view = registry.view<sprite_sequence, sprite_render>();
+
+        float delta_time_seconds = delta_time / 1000.0f;
+
+        for (auto [entity, sequence_data, render_data] : render_view.each())
+        {
+            if (!sequence_data.update )
+                continue;
+
+            sequence_data.current_delta += delta_time_seconds;
+
+            if (sequence_data.current_delta >= sequence_data.frame_time)
+            {
+                sequence_data.current_delta = 0;
+                sequence_data.current_frame = (sequence_data.current_frame + 1) % sequence_data.frame_count;
+
+                if (sequence_data.current_frame == 0)
+                {
+                    if (sequence_data.loop)
+                    {
+                        sequence_data.frames = sequence_data.first_frame;
+                    } else
+                    {
+                        sequence_data.update = false;
+                    }
+                } else
+                {
+                    sequence_data.frames++;
+                }
+
+                render_data.source = sequence_data.frames->source;
+            }
         }
     }
 
