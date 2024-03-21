@@ -33,9 +33,12 @@ struct lifetime
 {
     float lifetime;
     float elapsed;
+
+    std::function<void(entt::registry&)> on_end = nullptr;
 };
 
-enum class GAME_TEXTURES : std::uint32_t {
+enum class GAME_TEXTURES : std::uint32_t
+{
     MAINTEXTURE  = "MAINTEX"_hs,
     PLANETEXTURE = "EXPTEX"_hs
 

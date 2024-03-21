@@ -15,6 +15,7 @@ class input_handler {
     command* acceleration_button_pressed;
     command* mouse_moved;
 	command* shoot_button_pressed;
+
     entt::registry& registry;
 };
 

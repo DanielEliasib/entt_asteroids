@@ -42,18 +42,11 @@ class shoot_input_command : public command {
     shoot_input_command(entt::registry& registry) :
         command(registry)
     {
-        auto player_entity = registry.view<Player, transform>().front();
-        if (registry.valid(player_entity))
-        {
-            _player_entity = player_entity;
-        }
-
         _cooldown = _short_cooldown;
     }
     void execute(Vector2 input) override;
 
    protected:
-    entt::entity _player_entity = entt::null;
     std::chrono::high_resolution_clock::time_point _last_shot_time;
 
     uint16_t _shots_fired = 0;

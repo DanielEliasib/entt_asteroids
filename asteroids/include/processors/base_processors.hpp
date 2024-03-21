@@ -23,6 +23,11 @@ struct lifetime_process : entt::process<lifetime_process, std::uint32_t>
         {
             if (lifetime_data.elapsed >= lifetime_data.lifetime)
             {
+				if (lifetime_data.on_end != nullptr)
+				{
+					lifetime_data.on_end(registry);
+				}
+
                 registry.destroy(entity);
                 continue;
             }

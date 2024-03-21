@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <entt/entt.hpp>
 
+using entt::operator""_hs;
 
 struct Player
 {
@@ -14,6 +15,8 @@ struct Player
     uint32_t score;
     uint8_t lives;
 };
+
+static const std::uint32_t player_tag = "PLAYER"_hs;
 
 entt::entity create_player(entt::registry& registry, uint8_t id);
 

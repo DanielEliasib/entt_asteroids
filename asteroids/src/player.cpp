@@ -28,16 +28,29 @@ void on_player_collision(entt::registry& registry, entt::entity player_entity, e
 
     if (registry.valid(player_entity))
     {
-        auto& player_data = registry.get<Player>(player_entity);
+        auto player_data_entry = registry.view<Player>().front();
+
+        auto& player_data = registry.get<Player>(player_data_entry);
         player_data.lives -= 1;
 
+        Player player_data_copy = player_data;
+
+        registry.destroy(player_entity);
         spawn_explosion(registry, player_transform.position, 3);
 
         if (player_data.lives <= 0)
         {
-            registry.destroy(player_entity);
             return;
         }
+
+        lifetime restore_cooldown;
+        restore_cooldown.lifetime = 3;
+        restore_cooldown.on_end   = [](entt::registry& registry) {
+            create_player(registry, 0);
+        };
+
+        auto restore_player_entity = registry.create();
+        registry.emplace<lifetime>(restore_player_entity, restore_cooldown);
     }
 }
 
@@ -53,7 +66,7 @@ entt::entity create_player(entt::registry& registry, uint8_t id)
     player_collider.radius = 10;
     player_collider.on_collision.connect<&on_player_collision>();
 
-    registry.emplace<Player>(entity, Player{id, 0, 3});
+    // registry.emplace<Player>(entity, player_data);
     registry.emplace<transform>(
         entity,
         transform{
@@ -62,6 +75,26 @@ entt::entity create_player(entt::registry& registry, uint8_t id)
             Vector2{0, 1}, 0});
     registry.emplace<physics>(entity, physics{Vector2{0, 0}, 0, 0.005f, Vector2{0, 0}, Vector2{0, 0}});
     registry.emplace<circle_collider>(entity, player_collider);
+    registry.emplace<entt::tag<player_tag>>(entity);
+
+	// TODO: CLEAN
+    bool player_exists = false;
+    auto player_view   = registry.view<Player>();
+    for (auto player_entity : player_view)
+    {
+        auto& player_data = player_view.get<Player>(player_entity);
+
+        if (player_data.id == id)
+        {
+            player_exists = true;
+        }
+    }
+
+    if (!player_exists)
+    {
+        entt::entity player_data_entity = registry.create();
+        registry.emplace<Player>(player_data_entity, Player{id, 0, 3});
+    }
 
     float scale = player_collider.radius * 2 / 96.0f;
 
