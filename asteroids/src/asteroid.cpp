@@ -9,6 +9,7 @@
 #include "components/physics.hpp"
 #include "components/player.hpp"
 #include "math.hpp"
+#include "teams.hpp"
 
 void spawn_random_asteroid_distribution(entt::registry& registry, int count)
 {
@@ -56,8 +57,27 @@ void on_player_score(entt::registry& registry, entt::entity asteroid_entity, Vec
     player_data.score += score;
 }
 
+void on_asteroid_break_by_bullet(entt::registry& registry, entt::entity bullet_entity, entt::entity asteroid_entity)
+{
+    if (!registry.all_of<physics>(bullet_entity) || !registry.all_of<asteroid>(asteroid_entity))
+        return;
+
+    auto bullet_physics         = registry.get<physics>(bullet_entity);
+    Vector2 normalizedDirection = Vector2Normalize(bullet_physics.velocity);
+
+    auto asteroid_data = registry.get<asteroid>(asteroid_entity);
+    int8_t level       = asteroid_data.level - 1;
+
+    asteroid_data.on_asteroid_death(registry, asteroid_entity, normalizedDirection, level);
+}
+
 void on_asteroid_break(entt::registry& registry, entt::entity asteroid_entity, Vector2 normalizedDirection, int8_t level)
 {
+    if (!registry.all_of<asteroid>(asteroid_entity))
+        return;
+
+    auto asteroid_data = registry.get<asteroid>(asteroid_entity);
+
     on_player_score(registry, asteroid_entity, normalizedDirection, level);
 
     if (level <= 0)
@@ -75,7 +95,6 @@ void on_asteroid_break(entt::registry& registry, entt::entity asteroid_entity, V
         spawn_asteroid(registry, position, velocity, level);
     };
 
-    auto asteroid_data  = registry.get<asteroid>(asteroid_entity);
     auto transform_data = registry.get<transform>(asteroid_entity);
     auto physics_data   = registry.get<physics>(asteroid_entity);
 
@@ -160,7 +179,12 @@ entt::entity spawn_asteroid(entt::registry& registry, Vector2 position, Vector2 
     auto texture_entity = registry.view<Texture2D, entt::tag<texture_tag>>().front();
     Texture2D tilesheet = registry.get<Texture2D>(texture_entity);
 
+    bullet_collision_responder bullet_responder;
+    bullet_responder.on_collision.connect<&on_asteroid_break_by_bullet>();
+    registry.emplace<bullet_collision_responder>(entity, bullet_responder);
+
     registry.emplace<sprite_render>(entity, sprite_render{tilesheet, source, scale, random_color()});
+    registry.emplace<entt::tag<team_enemy_tag>>(entity);
 
     return entity;
 }

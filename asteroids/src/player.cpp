@@ -3,6 +3,7 @@
 #include <raylib.h>
 
 #include <components/base.hpp>
+#include <cstdint>
 #include <iostream>
 
 #include "components/asteroid.hpp"
@@ -10,6 +11,7 @@
 #include "components/render.hpp"
 #include "raylib.h"
 #include "raymath.h"
+#include "teams.hpp"
 
 void on_player_collision(entt::registry& registry, entt::entity player_entity, entt::entity other_entity)
 {
@@ -76,8 +78,9 @@ entt::entity create_player(entt::registry& registry, uint8_t id)
     registry.emplace<physics>(entity, physics{Vector2{0, 0}, 0, 0.005f, Vector2{0, 0}, Vector2{0, 0}});
     registry.emplace<circle_collider>(entity, player_collider);
     registry.emplace<entt::tag<player_tag>>(entity);
+    registry.emplace<entt::tag<team_player_tag>>(entity);
 
-	// TODO: CLEAN
+    // TODO: CLEAN
     bool player_exists = false;
     auto player_view   = registry.view<Player>();
     for (auto player_entity : player_view)
@@ -109,15 +112,15 @@ entt::entity create_player(entt::registry& registry, uint8_t id)
 void on_bullet_collision(entt::registry& registry, entt::entity bullet_entity, entt::entity other_entity)
 {
     std::cout << "Bullet collision" << std::endl;
-    if (!registry.all_of<asteroid>(other_entity))
+    if (!registry.all_of<bullet_collision_responder>(other_entity))
         return;
 
-    auto bullet_physics = registry.get<physics>(bullet_entity);
-    auto asteroid_data  = registry.get<asteroid>(other_entity);
+    auto bullet_physics        = registry.get<physics>(bullet_entity);
+    auto bullet_responder_data = registry.get<bullet_collision_responder>(other_entity);
 
     if (registry.valid(other_entity))
     {
-        asteroid_data.on_asteroid_death(registry, other_entity, Vector2Normalize(bullet_physics.velocity), asteroid_data.level - 1);
+        bullet_responder_data.on_collision(registry, bullet_entity, other_entity);
     }
 
     if (registry.valid(bullet_entity))
@@ -127,16 +130,13 @@ void on_bullet_collision(entt::registry& registry, entt::entity bullet_entity, e
 }
 
 static std::unique_ptr<float> radius_ptr = std::make_unique<float>(1.5f);
+
+template<const std::uint32_t team>
 entt::entity spawn_bullet(entt::registry& registry, Vector2 position, Vector2 velocity)
 {
     static const std::uint32_t texture_tag = static_cast<std::uint32_t>(GAME_TEXTURES::MAINTEXTURE);
     entt::entity entity                    = registry.create();
     float angle                            = atan2(velocity.y, velocity.x) * RAD2DEG;
-
-    shape_render render_data;
-    render_data.color = RED;
-    render_data.shape = render_shape_type::CIRCLE;
-    render_data.data  = static_cast<void*>(radius_ptr.get());
 
     registry.emplace<transform>(entity, transform{position, Vector2{0, 1}, angle});
     registry.emplace<physics>(entity, physics{velocity, 0, 0.0f, Vector2{0, 0}, Vector2{0, 0}});
@@ -153,10 +153,18 @@ entt::entity spawn_bullet(entt::registry& registry, Vector2 position, Vector2 ve
     auto texture_entity = registry.view<Texture2D, entt::tag<texture_tag>>().front();
     Texture2D tilesheet = registry.get<Texture2D>(texture_entity);
 
-    registry.emplace<sprite_render>(entity, sprite_render{tilesheet, Rectangle{560, 432, 32, 32}, scale, RED});
+    registry.emplace<sprite_render>(entity,
+                                    sprite_render{
+                                        tilesheet,
+                                        Rectangle{560, 432, 32, 32},
+                                        scale,
+                                        team == team_player_tag ? BLUE : RED});
+    registry.emplace<entt::tag<team>>(entity);
 
     return entity;
 }
+template entt::entity spawn_bullet<team_player_tag>(entt::registry&, Vector2, Vector2);
+template entt::entity spawn_bullet<team_enemy_tag>(entt::registry&, Vector2, Vector2);
 
 entt::entity spawn_explosion(entt::registry& registry, Vector2 position, float scale)
 {

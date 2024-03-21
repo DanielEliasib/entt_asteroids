@@ -1,6 +1,7 @@
 // #include <components/base.hpp>
 #include <components/player.hpp>
 #include <iostream>
+#include <teams.hpp>
 #include <utils/command.hpp>
 
 #include "math.hpp"
@@ -48,8 +49,8 @@ void mouse_input_command::execute(Vector2 input)
 
 void shoot_input_command::execute(Vector2 input)
 {
-    auto player_view = registry.view<entt::tag<player_tag>, transform, physics>();
-	auto player_entity = player_view.front();
+    auto player_view   = registry.view<entt::tag<player_tag>, transform, physics>();
+    auto player_entity = player_view.front();
 
     if (!registry.valid(player_entity))
         return;
@@ -79,7 +80,7 @@ void shoot_input_command::execute(Vector2 input)
     auto angle           = player_transform.rotation * DEG2RAD;
     auto direction       = Vector2{cos(angle), sin(angle)};
     auto bullet_velocity = player_physics.velocity + direction * 320.0f;
-    spawn_bullet(registry, player_transform.position, bullet_velocity);
+    spawn_bullet<team_player_tag>(registry, player_transform.position, bullet_velocity);
 
     _shots_fired++;
 

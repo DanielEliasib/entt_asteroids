@@ -28,7 +28,7 @@ class state_transition {
 
 class state {
    public:
-    state(std::function<void()> on_enter, std::function<void()> on_exit, std::function<void()> update) :
+    state(std::function<void()> on_enter, std::function<void()> on_exit, std::function<void(float)> update) :
         _on_enter(on_enter),
         _on_exit(on_exit),
         _update(update){};
@@ -39,11 +39,11 @@ class state {
     }
 
    protected:
-    void update()
+    void update(float delta_time)
     {
         if (_update != nullptr)
         {
-            _update();
+            _update(delta_time);
         }
     };
 
@@ -81,9 +81,9 @@ class state {
 
     std::vector<state_transition> _transitions;
 
-    std::function<void()> _on_enter = nullptr;
-    std::function<void()> _on_exit  = nullptr;
-    std::function<void()> _update   = nullptr;
+    std::function<void()> _on_enter    = nullptr;
+    std::function<void()> _on_exit     = nullptr;
+    std::function<void(float)> _update = nullptr;
 
     friend class state_machine;
 };
@@ -93,13 +93,13 @@ class state_machine {
     state_machine(std::shared_ptr<state> initial_state) :
         _current_state(initial_state) { assert(_current_state != nullptr); };
 
-    void update()
+    void update(float delta_time)
     {
         std::shared_ptr<state> next_state = nullptr;
 
         if (_current_state != nullptr)
         {
-            _current_state->update();
+            _current_state->update(delta_time);
             _current_state->evaluate_transitions(next_state);
         }
 

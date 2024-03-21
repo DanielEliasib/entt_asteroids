@@ -10,4 +10,9 @@ struct circle_collider
     entt::delegate<void(entt::registry&, entt::entity, entt::entity)> on_collision;
 };
 
+struct bullet_collision_responder
+{
+    entt::delegate<void(entt::registry&, entt::entity, entt::entity)> on_collision;
+};
+
 #endif // PHYSICS_HPP

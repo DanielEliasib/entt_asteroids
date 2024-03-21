@@ -4,13 +4,14 @@
 #include <raylib.h>
 
 #include <entt/entt.hpp>
+#include <memory>
 #include <utils/state.hpp>
 
 using entt::operator""_hs;
 
 struct enemy_ai
 {
-    state_machine ai_machine;
+    std::shared_ptr<state_machine> ai_machine;
 };
 
 static const std::uint32_t enemy_tag = "ENEMY"_hs;

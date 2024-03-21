@@ -29,7 +29,7 @@ void state_machine_test()
         std::cout << "Enter printing state" << std::endl;
         print_count = 0;
     };
-    auto print_update = [&print_count]() {
+    auto print_update = [&print_count](float delta_time) {
         std::cout << "Update printing state" << std::endl;
         print_count++;
     };
@@ -41,7 +41,7 @@ void state_machine_test()
         std::cout << "Enter WARNING state" << std::endl;
         print_count = 0;
     };
-    auto warning_update = [&print_count]() {
+    auto warning_update = [&print_count](float delta_time) {
         std::cout << "Update WARNING state" << std::endl;
         print_count++;
     };
@@ -59,7 +59,7 @@ void state_machine_test()
 
     for (int i = 0; i < 13; i++)
     {
-        machine.update();
+        machine.update(1);
     }
 
     std::cout << "End of state machine test" << std::endl;

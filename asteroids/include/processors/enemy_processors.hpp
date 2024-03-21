@@ -5,7 +5,7 @@
 
 #include <components/enemy.hpp>
 #include <entt/entt.hpp>
-
+#include <iostream>
 
 struct enemy_ai_process : entt::process<enemy_ai_process, std::uint32_t>
 {
@@ -16,11 +16,12 @@ struct enemy_ai_process : entt::process<enemy_ai_process, std::uint32_t>
 
     void update(delta_type delta_time, void*)
     {
+        auto delta = static_cast<float>(delta_time) / 1000.0f;
+
         auto view = registry.view<enemy_ai>();
-        for (auto entity : view)
+        for (auto [entity, ai_data] : view.each())
         {
-            auto& ai = view.get<enemy_ai>(entity);
-            ai.ai_machine.update();
+            ai_data.ai_machine->update(delta);
         }
     }
 
