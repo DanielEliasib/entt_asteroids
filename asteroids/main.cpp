@@ -12,8 +12,10 @@
 
 #include "components/asteroid.hpp"
 #include "components/base.hpp"
+#include "components/enemy.hpp"
 #include "components/render.hpp"
 #include "processors/base_processors.hpp"
+#include "processors/enemy_processors.hpp"
 #include "utils/input_handler.hpp"
 #include "utils/state.hpp"
 
@@ -72,12 +74,11 @@ int main()
     Color background_color = {15, 15, 15, 255};
     Color text_color       = {204, 191, 147, 255};
 
-    state_machine_test();
-
     entt::registry registry;
 
     entt::scheduler general_scheduler;
     general_scheduler.attach<lifetime_process>(registry);
+    general_scheduler.attach<enemy_ai_process>(registry);
     general_scheduler.attach<physics_process>(registry);
     general_scheduler.attach<collision_process>(registry);
     general_scheduler.attach<boundary_process>(registry);
@@ -99,6 +100,8 @@ int main()
     spawn_main_camera(registry);
 
     spawn_random_asteroid_distribution(registry, 4);
+
+    spawn_enemy(registry, {100, 100});
 
     while (!WindowShouldClose())
     {

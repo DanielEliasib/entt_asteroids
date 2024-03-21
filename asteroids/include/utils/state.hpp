@@ -1,3 +1,5 @@
+#ifndef STATE_HPP
+#define STATE_HPP
 
 #include <cassert>
 #include <functional>
@@ -110,3 +112,5 @@ class state_machine {
    protected:
     std::shared_ptr<state> _current_state = nullptr;
 };
+
+#endif // STATE_HPP
