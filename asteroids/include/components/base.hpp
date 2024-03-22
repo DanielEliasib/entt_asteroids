@@ -37,6 +37,14 @@ struct lifetime
     std::function<void(entt::registry&)> on_end = nullptr;
 };
 
+static const std::uint32_t kill_tag = "KILL"_hs;
+
+enum struct team
+{
+    PLAYER,
+    ENEMY,
+};
+
 enum class GAME_TEXTURES : std::uint32_t
 {
     MAINTEXTURE  = "MAINTEX"_hs,

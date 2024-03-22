@@ -16,6 +16,7 @@ struct enemy_ai
 
 static const std::uint32_t enemy_tag = "ENEMY"_hs;
 
+void spawn_random_enemy(entt::registry& registry);
 entt::entity spawn_enemy(entt::registry& registry, Vector2 position);
 
 #endif // ENEMY_HPP

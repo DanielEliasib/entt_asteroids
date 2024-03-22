@@ -7,6 +7,26 @@
 
 #include "components/base.hpp"
 
+struct cleanup_process : entt::process<cleanup_process, std::uint32_t>
+{
+    using delta_type = std::uint32_t;
+
+    cleanup_process(entt::registry& registry) :
+        registry(registry) {}
+
+    void update(delta_type delta_time, void*)
+    {
+        auto cleanup_view = registry.view<entt::tag<kill_tag>>();
+
+        for (auto [entity] : cleanup_view.each())
+        {
+            registry.destroy(entity);
+        }
+    }
+
+   protected:
+    entt::registry& registry;
+};
 
 struct lifetime_process : entt::process<lifetime_process, std::uint32_t>
 {
@@ -23,12 +43,12 @@ struct lifetime_process : entt::process<lifetime_process, std::uint32_t>
         {
             if (lifetime_data.elapsed >= lifetime_data.lifetime)
             {
-				if (lifetime_data.on_end != nullptr)
-				{
-					lifetime_data.on_end(registry);
-				}
+                if (lifetime_data.on_end != nullptr)
+                {
+                    lifetime_data.on_end(registry);
+                }
 
-                registry.destroy(entity);
+                registry.emplace<entt::tag<kill_tag>>(entity);
                 continue;
             }
 

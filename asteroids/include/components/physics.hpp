@@ -10,7 +10,12 @@ struct circle_collider
     entt::delegate<void(entt::registry&, entt::entity, entt::entity)> on_collision;
 };
 
-struct bullet_collision_responder
+struct bullet_collision_response
+{
+    entt::delegate<void(entt::registry&, entt::entity, entt::entity)> on_collision;
+};
+
+struct asteroid_collision_response
 {
     entt::delegate<void(entt::registry&, entt::entity, entt::entity)> on_collision;
 };

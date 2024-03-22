@@ -89,6 +89,10 @@ int main()
     render_scheduler.attach<shape_render_process>(registry);
     render_scheduler.attach<ui_process>(registry);
     // render_scheduler.attach<camera_process>(registry);
+    //
+
+    entt::scheduler cleanup_scheduler;
+    cleanup_scheduler.attach<cleanup_process>(registry);
 
     LoadTextureToEntity<GAME_TEXTURES::MAINTEXTURE>("asteroids/resources/simpleSpace_tilesheet.png", registry);
     LoadTextureToEntity<GAME_TEXTURES::PLANETEXTURE>("asteroids/resources/simplePlanes_tilesheet.png", registry);
@@ -101,7 +105,7 @@ int main()
 
     spawn_random_asteroid_distribution(registry, 4);
 
-    spawn_enemy(registry, {100, 100});
+    spawn_random_enemy(registry);
 
     while (!WindowShouldClose())
     {
@@ -121,6 +125,8 @@ int main()
 
         EndMode2D();
         EndDrawing();
+
+        cleanup_scheduler.update(delta_time);
     }
 
     return 0;

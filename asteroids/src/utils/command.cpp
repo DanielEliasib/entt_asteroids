@@ -4,6 +4,7 @@
 #include <teams.hpp>
 #include <utils/command.hpp>
 
+#include "components/base.hpp"
 #include "math.hpp"
 #include "raymath.h"
 
@@ -80,7 +81,7 @@ void shoot_input_command::execute(Vector2 input)
     auto angle           = player_transform.rotation * DEG2RAD;
     auto direction       = Vector2{cos(angle), sin(angle)};
     auto bullet_velocity = player_physics.velocity + direction * 320.0f;
-    spawn_bullet<team_player_tag>(registry, player_transform.position, bullet_velocity);
+    spawn_bullet(registry, player_transform.position, bullet_velocity, team::PLAYER);
 
     _shots_fired++;
 

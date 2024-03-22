@@ -13,11 +13,25 @@
 
 void spawn_random_asteroid_distribution(entt::registry& registry, int count)
 {
+    const float screenWidth  = GetScreenWidth();
+    const float screenHeight = GetScreenHeight();
+
+    const Rectangle top_rect    = {-40, -40, screenWidth + 40.0f, 40};
+    const Rectangle bottom_rect = {-40, screenHeight, screenWidth + 40.0f, 40};
+    const Rectangle left_rect   = {-40, -40, 40, screenHeight + 40.0f};
+    const Rectangle right_rect  = {screenWidth, -40, 40, screenHeight + 40.0f};
+
+    const std::array<Rectangle, 4> rects = {top_rect, bottom_rect, left_rect, right_rect};
+
     for (int i = 0; i < count; i++)
     {
-        float angle = GetRandomValue(0, 360);
-        float x     = GetRandomValue(20, GetScreenWidth() - 20);
-        float y     = GetRandomValue(20, GetScreenHeight() - 20);
+        int random            = GetRandomValue(0, 3);
+        const Rectangle& rect = rects[random];
+
+        float x = GetRandomValue(rect.x, rect.x + rect.width);
+        float y = GetRandomValue(rect.y, rect.y + rect.height);
+
+        float angle = GetRandomValue(15, 345);
         float speed = GetRandomValue(100, 200);
 
         Vector2 position = {x, y};
@@ -82,7 +96,7 @@ void on_asteroid_break(entt::registry& registry, entt::entity asteroid_entity, V
 
     if (level <= 0)
     {
-        registry.destroy(asteroid_entity);
+        registry.emplace<entt::tag<kill_tag>>(asteroid_entity);
         return;
     }
 
@@ -99,10 +113,33 @@ void on_asteroid_break(entt::registry& registry, entt::entity asteroid_entity, V
     auto physics_data   = registry.get<physics>(asteroid_entity);
 
     std::cout << "Asteroid break level " << static_cast<int>(level) << std::endl;
-    registry.destroy(asteroid_entity);
+    registry.emplace<entt::tag<kill_tag>>(asteroid_entity);
 
     generate_asteroid(transform_data.position, physics_data.velocity);
     generate_asteroid(transform_data.position, physics_data.velocity);
+}
+
+void on_asteroid_collision(entt::registry& registry, entt::entity asteroid_entity, entt::entity other_entity)
+{
+    std::cout << "Asteroid collision" << std::endl;
+    if (!registry.all_of<asteroid_collision_response>(other_entity))
+        return;
+
+    if (!registry.all_of<team>(other_entity) || !registry.all_of<team>(asteroid_entity))
+        return;
+
+    auto asteroid_responder_data = registry.get<asteroid_collision_response>(other_entity);
+    auto asteroid_team           = registry.get<team>(asteroid_entity);
+
+    auto other_team = registry.get<team>(other_entity);
+
+    if (asteroid_team == other_team)
+        return;
+
+    if (registry.valid(other_entity))
+    {
+        asteroid_responder_data.on_collision(registry, asteroid_entity, other_entity);
+    }
 }
 
 static std::unique_ptr<float> a_radius_2_ptr = std::make_unique<float>(50.0f);
@@ -170,6 +207,7 @@ entt::entity spawn_asteroid(entt::registry& registry, Vector2 position, Vector2 
 
     circle_collider asteroid_collider;
     asteroid_collider.radius = *radius;
+    asteroid_collider.on_collision.connect<&on_asteroid_collision>();
     registry.emplace<circle_collider>(entity, asteroid_collider);
 
     float sprite_size = level < 3 ? 64 : 96;
@@ -179,12 +217,12 @@ entt::entity spawn_asteroid(entt::registry& registry, Vector2 position, Vector2 
     auto texture_entity = registry.view<Texture2D, entt::tag<texture_tag>>().front();
     Texture2D tilesheet = registry.get<Texture2D>(texture_entity);
 
-    bullet_collision_responder bullet_responder;
+    bullet_collision_response bullet_responder;
     bullet_responder.on_collision.connect<&on_asteroid_break_by_bullet>();
-    registry.emplace<bullet_collision_responder>(entity, bullet_responder);
+    registry.emplace<bullet_collision_response>(entity, bullet_responder);
 
     registry.emplace<sprite_render>(entity, sprite_render{tilesheet, source, scale, random_color()});
-    registry.emplace<entt::tag<team_enemy_tag>>(entity);
+    registry.emplace<team>(entity, team::ENEMY);
 
     return entity;
 }

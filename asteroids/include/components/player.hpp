@@ -7,6 +7,8 @@
 #include <cstdint>
 #include <entt/entt.hpp>
 
+#include "components/base.hpp"
+
 using entt::operator""_hs;
 
 struct Player
@@ -20,8 +22,7 @@ static const std::uint32_t player_tag = "PLAYER"_hs;
 
 entt::entity create_player(entt::registry& registry, uint8_t id);
 
-template<const std::uint32_t team>
-entt::entity spawn_bullet(entt::registry& registry, Vector2 position, Vector2 velocity);
+entt::entity spawn_bullet(entt::registry& registry, Vector2 position, Vector2 velocity, const team& bullet_team);
 
 entt::entity spawn_explosion(entt::registry& registry, Vector2 position, float scale);
 #endif // PLAYER_HPP
