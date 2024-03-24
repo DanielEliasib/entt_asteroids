@@ -6,10 +6,6 @@
 #include <chrono>
 #include <entt/entt.hpp>
 
-#include "components/base.hpp"
-#include "components/player.hpp"
-
-
 struct Vector2;
 
 class command {

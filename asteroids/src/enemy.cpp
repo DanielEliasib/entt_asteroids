@@ -3,12 +3,10 @@
 #include <components/base.hpp>
 #include <components/player.hpp>
 #include <components/render.hpp>
-#include <iostream>
 #include <memory>
 
 #include "components/physics.hpp"
 #include "math.hpp"
-#include "teams.hpp"
 #include "utils/state.hpp"
 
 void on_enemy_collision(entt::registry& registry, entt::entity bullet_entity, entt::entity enemy_entity)
@@ -99,8 +97,6 @@ entt::entity spawn_enemy(entt::registry& registry, Vector2 position)
         direction         = Vector2Normalize(direction);
 
         enemy_physics.external_impulse = enemy_physics.external_impulse + direction * 120.0f;
-
-        std::cout << "CHASING" << std::endl;
     };
 
     std::shared_ptr<state> chasing_state = std::make_shared<state>(nullptr, nullptr, on_chasing_update);
@@ -108,7 +104,6 @@ entt::entity spawn_enemy(entt::registry& registry, Vector2 position)
     // INFO: ATTACK STATE
     std::shared_ptr<float> attack_elapsed_time = std::make_shared<float>(0);
     static auto on_attack_update               = [&registry, attack_elapsed_time](float delta_time) {
-        std::cout << "Elapse time: " << *attack_elapsed_time << std::endl;
         float temp           = *attack_elapsed_time + delta_time;
         *attack_elapsed_time = temp;
 

@@ -4,7 +4,6 @@
 #include <cassert>
 #include <functional>
 #include <memory>
-#include <unordered_map>
 
 class state;
 
@@ -93,20 +92,36 @@ class state_machine {
     state_machine(std::shared_ptr<state> initial_state) :
         _current_state(initial_state) { assert(_current_state != nullptr); };
 
+    void start()
+    {
+        if (_current_state == nullptr)
+            return;
+
+        _current_state->on_enter();
+    }
+
     void update(float delta_time)
     {
+        if (_current_state == nullptr)
+            return;
+
         std::shared_ptr<state> next_state = nullptr;
 
-        if (_current_state != nullptr)
-        {
-            _current_state->update(delta_time);
-            _current_state->evaluate_transitions(next_state);
-        }
+        _current_state->update(delta_time);
+        _current_state->evaluate_transitions(next_state);
 
         if (next_state != nullptr)
         {
             _current_state = next_state;
         }
+    }
+
+    void stop()
+    {
+        if (_current_state == nullptr)
+            return;
+
+        _current_state->on_exit();
     }
 
    protected:

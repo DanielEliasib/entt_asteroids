@@ -5,7 +5,6 @@
 
 #include <components/enemy.hpp>
 #include <entt/entt.hpp>
-#include <iostream>
 
 struct enemy_ai_process : entt::process<enemy_ai_process, std::uint32_t>
 {

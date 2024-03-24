@@ -1,6 +1,5 @@
 // #include <components/base.hpp>
 #include <components/player.hpp>
-#include <iostream>
 #include <teams.hpp>
 #include <utils/command.hpp>
 
@@ -10,8 +9,6 @@
 
 void acceleration_input_command::execute(Vector2 input)
 {
-    std::cout << "Acceleration button pressed" << std::endl;
-
     auto physics_view = registry.view<entt::tag<player_tag>, physics, transform>();
     for (auto [entity, physics_data, transform_data] : physics_view.each())
     {
