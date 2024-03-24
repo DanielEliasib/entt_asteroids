@@ -54,68 +54,10 @@ struct text_render_process : entt::process<text_render_process, std::uint32_t>
                 position.x = -width / 2;
             }
 
-            std::cout << "text: " << *text << std::endl;
             DrawText(text, position.x, position.y, render_data.font_size, render_data.color);
 
             rlPopMatrix();
         }
-    }
-
-   protected:
-    entt::registry& registry;
-};
-
-struct ui_process : entt::process<ui_process, std::uint32_t>
-{
-    using delta_type = std::uint32_t;
-
-    ui_process(entt::registry& registry) :
-        registry(registry) {}
-
-    std::string lives_to_string(int lives)
-    {
-        std::ostringstream ss;
-
-        for (int i = 0; i < lives; i++)
-        {
-            ss << "X";
-        }
-
-        ss << std::setw(3) << std::setfill(' ');
-
-        return ss.str();
-    }
-
-    void update(delta_type delta_time, void*)
-    {
-        auto player_entity = registry.view<Player>().front();
-
-        if (!registry.valid(player_entity))
-        {
-            return;
-        }
-
-        auto player_data = registry.get<Player>(player_entity);
-
-        int width          = GetScreenWidth();
-        const int fontSize = 30;
-
-        auto score = TextFormat("%05i", player_data.score);
-        auto lives = lives_to_string(player_data.lives).c_str();
-
-        int text_size = MeasureText(score, fontSize);
-
-        int posX = width / 2 - (text_size) / 2;
-
-        DrawText(score,
-                 posX, 10, fontSize, WHITE);
-
-        text_size = MeasureText(lives, fontSize);
-        posX      = width / 2 - (text_size) / 2;
-        DrawText(lives,
-                 posX, 40, fontSize, WHITE);
-
-        // DrawCircleLinesV(player_transform.position, 10, RED);
     }
 
    protected:

@@ -136,7 +136,6 @@ inline const void create_game_scene(std::shared_ptr<state>& scene_state)
         general_scheduler->attach<collision_process>(*registry);
         general_scheduler->attach<boundary_process>(*registry);
 
-        // render_scheduler->attach<ui_process>(*registry);
         render_scheduler->attach<text_render_process>(*registry);
         render_scheduler->attach<sprite_render_process>(*registry);
         render_scheduler->attach<sprite_sequence_process>(*registry);

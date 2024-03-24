@@ -11,11 +11,10 @@
 #include "scenes/scene_management.hpp"
 #include "utils/state.hpp"
 
-
 int main()
 {
     const char* TITLE = "ASTEROIDS";
-    InitWindow(800, 800, TITLE);
+    InitWindow(900, 600, TITLE);
     SetTargetFPS(60);
 
     auto game_machine = create_game_state_machine();
