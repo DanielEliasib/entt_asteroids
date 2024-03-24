@@ -4,14 +4,15 @@
 
 #include <components/base.hpp>
 #include <cstdint>
+#include <functional>
+#include <iomanip>
 #include <iostream>
+#include <math.hpp>
+#include <sstream>
 
-#include "components/asteroid.hpp"
 #include "components/physics.hpp"
 #include "components/render.hpp"
 #include "raylib.h"
-#include "raymath.h"
-#include "teams.hpp"
 
 void on_player_explosion(entt::registry& registry, entt::entity player_entity, entt::entity other_entity)
 {
@@ -34,6 +35,8 @@ void on_player_explosion(entt::registry& registry, entt::entity player_entity, e
 
         if (player_data.lives <= 0)
         {
+            spawn_game_over(registry);
+
             return;
         }
 
@@ -68,7 +71,7 @@ entt::entity create_player(entt::registry& registry, uint8_t id)
         entity,
         transform{
             Vector2{screenWidth * 0.5f, screenHeight * 0.5f},
-            Vector2{0, 1}, 0});
+            0});
     registry.emplace<physics>(entity, physics{Vector2{0, 0}, 0, 0.005f, Vector2{0, 0}, Vector2{0, 0}});
     registry.emplace<circle_collider>(entity, player_collider);
     registry.emplace<entt::tag<player_tag>>(entity);
@@ -148,7 +151,7 @@ entt::entity spawn_bullet(entt::registry& registry, Vector2 position, Vector2 ve
     entt::entity entity                    = registry.create();
     float angle                            = atan2(velocity.y, velocity.x) * RAD2DEG;
 
-    registry.emplace<transform>(entity, transform{position, Vector2{0, 1}, angle});
+    registry.emplace<transform>(entity, transform{position, angle});
     registry.emplace<physics>(entity, physics{velocity, 0, 0.0f, Vector2{0, 0}, Vector2{0, 0}});
     // registry.emplace<shape_render>(entity, render_data);
     registry.emplace<lifetime>(entity, lifetime{2.5f, 0});
@@ -202,8 +205,125 @@ entt::entity spawn_explosion(entt::registry& registry, Vector2 position, float s
 
     registry.emplace<sprite_render>(entity, sprite_render{tilesheet, frames[0].source, scale, WHITE});
     registry.emplace<sprite_sequence>(entity, explosion_sequence);
-    registry.emplace<transform>(entity, transform{position, Vector2{0, 1}, 0});
+    registry.emplace<transform>(entity, transform{position, 0});
     registry.emplace<lifetime>(entity, lifetime{0.2f * 5, 0});
 
     return entity;
+}
+
+void spawn_game_ui(entt::registry& registry)
+{
+    auto title_text_entity = registry.create();
+
+    auto make_dynamic_text = [&registry](std::function<const char*(entt::registry&)> text, int font_size, Vector2 position, Color color) {
+        auto text_entity = registry.create();
+
+        dynamic_text_render text_component;
+        text_component.font          = GetFontDefault();
+        text_component.text_function = text;
+        text_component.font_size     = font_size;
+        text_component.color         = color;
+        text_component.center        = true;
+
+        transform text_transform;
+        text_transform.position = position;
+        text_transform.rotation = 0.0f;
+
+        registry.emplace<transform>(text_entity, text_transform);
+        registry.emplace<dynamic_text_render>(text_entity, text_component);
+    };
+
+    auto score_text = [](entt::registry& registry) -> const char* {
+        auto player_entity = registry.view<Player>().front();
+
+        if (!registry.valid(player_entity))
+        {
+            return "";
+        }
+
+        auto player_data = registry.get<Player>(player_entity);
+
+        auto score = TextFormat("%05i", player_data.score);
+        return score;
+    };
+
+    auto lives_text = [](entt::registry& registry) -> const char* {
+        auto player_entity = registry.view<Player>().front();
+
+        if (!registry.valid(player_entity))
+        {
+            return "";
+        }
+
+        auto player_data = registry.get<Player>(player_entity);
+
+        std::ostringstream ss;
+
+        for (int i = 0; i < player_data.lives; i++)
+        {
+            ss << "X";
+        }
+
+        ss << std::setw(3)
+           << std::setfill(' ');
+
+        return TextFormat("%s", ss.str().c_str());
+    };
+
+    float screenWidth = GetScreenWidth();
+
+    Vector2 position = Vector2{screenWidth / 2.0f,
+                               10};
+
+    make_dynamic_text(score_text, 30, position, RAYWHITE);
+
+    position.y = 40;
+    make_dynamic_text(lives_text, 30, position, RAYWHITE);
+}
+
+void spawn_game_over(entt::registry& registry)
+{
+    auto make_text = [&registry](const char* text, int font_size, Vector2 position, Color color) {
+        auto text_entity = registry.create();
+
+        text_render text_component;
+        text_component.font      = GetFontDefault();
+        text_component.text      = text;
+        text_component.font_size = font_size;
+        text_component.color     = color;
+
+        int textWidth = MeasureText(text_component.text, text_component.font_size);
+
+        transform text_transform;
+        text_transform.position = position;
+        text_transform.rotation = 0.0f;
+
+        registry.emplace<transform>(text_entity, text_transform);
+        registry.emplace<text_render>(text_entity, text_component);
+    };
+
+    float screenWidth  = GetScreenWidth();
+    float screenHeight = GetScreenHeight();
+
+    const char* title_text = "GAME OVER";
+
+    int fontSize  = 50;
+    int textWidth = MeasureText(title_text, fontSize);
+
+    Vector2 position = Vector2{(screenWidth - textWidth) / 2.0f,
+                               screenHeight / 2.0f - 50.0f};
+
+    make_text(title_text, fontSize, position, RED);
+    make_text(title_text, fontSize, position + Vector2{5, 5}, BLACK);
+
+    const char* subtitle_text = "Press ESC to close";
+
+    fontSize  = 30;
+    textWidth = MeasureText(subtitle_text, fontSize);
+
+    position = Vector2{(screenWidth - textWidth) / 2.0f,
+                       screenHeight / 2.0f + 10.0f};
+
+    make_text(subtitle_text, fontSize, position, RAYWHITE);
+    make_text(subtitle_text, fontSize, position + Vector2{5, 5}, BLACK);
 }

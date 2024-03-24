@@ -69,6 +69,8 @@ struct boundary_process : entt::process<boundary_process, std::uint32_t>
 
     void update(delta_type delta_time, void*)
     {
+        const int border_width = 50;
+
         auto boundable_view = registry.view<transform>();
         auto camera_view    = registry.view<Camera2D>();
 
@@ -80,23 +82,23 @@ struct boundary_process : entt::process<boundary_process, std::uint32_t>
             auto screen_position = GetWorldToScreen2D(transform_data.position, camera_data);
             bool has_changed     = false;
 
-            if (screen_position.x <= 0)
+            if (screen_position.x <= 0 - border_width)
             {
-                screen_position.x = GetScreenWidth();
+                screen_position.x = GetScreenWidth() + border_width;
                 has_changed       = true;
-            } else if (screen_position.x >= GetScreenWidth())
+            } else if (screen_position.x >= GetScreenWidth() + border_width)
             {
-                screen_position.x = 0;
+                screen_position.x = 0 - border_width;
                 has_changed       = true;
             }
 
-            if (screen_position.y <= 0)
+            if (screen_position.y <= 0 - border_width)
             {
-                screen_position.y = GetScreenHeight();
+                screen_position.y = GetScreenHeight() + border_width;
                 has_changed       = true;
-            } else if (screen_position.y >= GetScreenHeight())
+            } else if (screen_position.y >= GetScreenHeight() + border_width)
             {
-                screen_position.y = 0;
+                screen_position.y = 0 - border_width;
                 has_changed       = true;
             }
 

@@ -101,10 +101,11 @@ void on_asteroid_break(entt::registry& registry, entt::entity asteroid_entity, V
     }
 
     auto generate_asteroid = [&registry, &normalizedDirection, &level](Vector2 position, Vector2 velocity) {
-        float angle          = GetRandomValue(-135, 135);
+        float angle          = GetRandomValue(-80, 80);
         auto break_direction = Vector2Rotate(normalizedDirection, angle * DEG2RAD) * 350.0f;
 
-        velocity = velocity + break_direction;
+        auto speed = Vector2Length(velocity) * 1.5f;
+        velocity   = Vector2Normalize(break_direction) * speed;
 
         spawn_asteroid(registry, position, velocity, level);
     };
@@ -201,7 +202,7 @@ entt::entity spawn_asteroid(entt::registry& registry, Vector2 position, Vector2 
     asteroid_data.level = level;
     asteroid_data.on_asteroid_death.connect<&on_asteroid_break>();
 
-    registry.emplace<transform>(entity, transform{position, Vector2{0, 1}, angle});
+    registry.emplace<transform>(entity, transform{position, angle});
     registry.emplace<physics>(entity, physics{velocity, 0, 0.0f, Vector2{0, 0}, Vector2{0, 0}});
     registry.emplace<asteroid>(entity, asteroid_data);
 

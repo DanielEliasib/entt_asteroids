@@ -3,18 +3,15 @@
 
 #include <raylib.h>
 
-#include <cstddef>
 #include <cstdint>
 #include <entt/entt.hpp>
 #include <functional>
-#include <string_view>
 
 using entt::operator""_hs;
 
 struct transform
 {
     Vector2 position;
-    Vector2 direction;
     float rotation;
 };
 

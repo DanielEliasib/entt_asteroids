@@ -1,7 +1,6 @@
 #ifndef RENDER_HPP
 #define RENDER_HPP
 
-#include <array>
 #include <cstdint>
 #include <entt/entt.hpp>
 
@@ -47,6 +46,24 @@ struct sprite_sequence
 
     float frame_time;
     float current_delta;
+};
+
+struct dynamic_text_render
+{
+    Font font;
+    float font_size;
+    Color color;
+    bool center;
+
+    std::function<const char*(entt::registry&)> text_function;
+};
+
+struct text_render
+{
+    Font font;
+    const char* text;
+    float font_size;
+    Color color;
 };
 
 static entt::entity LoadFontToEntity(const char* path, entt::registry& registry)

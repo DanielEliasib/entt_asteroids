@@ -8,9 +8,62 @@
 #include <components/render.hpp>
 #include <entt/entt.hpp>
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 
 #include "components/player.hpp"
+
+struct text_render_process : entt::process<text_render_process, std::uint32_t>
+{
+    using delta_type = std::uint32_t;
+
+    text_render_process(entt::registry& registry) :
+        registry(registry) {}
+
+    void update(delta_type delta_time, void*)
+    {
+        auto text_view = registry.view<transform, text_render>();
+
+        for (auto [entity, transform_data, render_data] : text_view.each())
+        {
+            rlPushMatrix();
+            rlTranslatef(transform_data.position.x, transform_data.position.y, 0.0f);
+            rlRotatef(transform_data.rotation, 0.0f, 0.0f, 1.0f);
+
+            DrawText(render_data.text,
+                     0, 0, render_data.font_size, render_data.color);
+
+            rlPopMatrix();
+        }
+
+        auto dynamic_text_view = registry.view<transform, dynamic_text_render>();
+
+        for (auto [entity, transform_data, render_data] : dynamic_text_view.each())
+        {
+            rlPushMatrix();
+            rlTranslatef(transform_data.position.x, transform_data.position.y, 0.0f);
+            rlRotatef(transform_data.rotation, 0.0f, 0.0f, 1.0f);
+
+            auto text = render_data.text_function(registry);
+
+            Vector2 position = {0, 0};
+
+            if (render_data.center)
+            {
+                int width  = MeasureText(text, render_data.font_size);
+                position.x = -width / 2;
+            }
+
+            std::cout << "text: " << *text << std::endl;
+            DrawText(text, position.x, position.y, render_data.font_size, render_data.color);
+
+            rlPopMatrix();
+        }
+    }
+
+   protected:
+    entt::registry& registry;
+};
 
 struct ui_process : entt::process<ui_process, std::uint32_t>
 {
@@ -42,7 +95,7 @@ struct ui_process : entt::process<ui_process, std::uint32_t>
             return;
         }
 
-        auto player_data      = registry.get<Player>(player_entity);
+        auto player_data = registry.get<Player>(player_entity);
 
         int width          = GetScreenWidth();
         const int fontSize = 30;
@@ -171,7 +224,7 @@ struct sprite_sequence_process : entt::process<sprite_sequence_process, std::uin
 
         for (auto [entity, sequence_data, render_data] : render_view.each())
         {
-            if (!sequence_data.update )
+            if (!sequence_data.update)
                 continue;
 
             sequence_data.current_delta += delta_time_seconds;

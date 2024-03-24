@@ -49,10 +49,8 @@ entt::entity spawn_enemy(entt::registry& registry, Vector2 position)
 
     registry.emplace<transform>(
         entity,
-        transform{
-            // Vector2{100, 100},
-            position,
-            Vector2{0, 1}, 0});
+        transform{position,
+                  0});
     registry.emplace<physics>(entity, physics{Vector2{0, 0}, 0, 0.005f, Vector2{0, 0}, Vector2{0, 0}});
     registry.emplace<entt::tag<enemy_tag>>(entity);
     registry.emplace<team>(entity, team::ENEMY);
