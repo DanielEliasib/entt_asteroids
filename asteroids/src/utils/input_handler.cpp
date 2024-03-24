@@ -3,6 +3,8 @@
 #include <math.hpp>
 #include <utils/input_handler.hpp>
 
+#include "components/player.hpp"
+#include "components/render.hpp"
 #include "raymath.h"
 
 input_handler::input_handler(entt::registry& registry) :

@@ -4,6 +4,7 @@
 #include <utils/command.hpp>
 
 #include "components/base.hpp"
+#include "components/render.hpp"
 #include "math.hpp"
 #include "raymath.h"
 
@@ -14,7 +15,14 @@ void acceleration_input_command::execute(Vector2 input)
     {
         // TODO: Change this so it is generated automatically every frame
         Vector2 direction             = Vector2Transform(Vector2{1, 0}, MatrixRotateZ(transform_data.rotation * DEG2RAD));
-        physics_data.external_impulse = physics_data.external_impulse + direction * 120.0f;
+        physics_data.external_impulse = physics_data.external_impulse + direction * 300.0f;
+    }
+
+    auto trailer_view = registry.view<entt::tag<player_trail_tag>, sprite_render>();
+
+    for (auto [entity, sprite] : trailer_view.each())
+    {
+        sprite.tint = WHITE;
     }
 }
 

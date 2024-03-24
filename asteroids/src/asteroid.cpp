@@ -11,6 +11,25 @@
 #include "math.hpp"
 #include "teams.hpp"
 
+void spawn_random_start_distribution(entt::registry& registry, int count)
+{
+    const float screenWidth  = GetScreenWidth();
+    const float screenHeight = GetScreenHeight();
+
+    for (int i = 0; i < count; i++)
+    {
+        float x = GetRandomValue(0, screenWidth);
+        float y = GetRandomValue(0, screenHeight);
+
+        float angle = GetRandomValue(15, 345);
+        float speed = GetRandomValue(100, 200);
+
+        Vector2 position = {x, y};
+
+        spawn_star(registry, position, angle);
+    }
+};
+
 void spawn_random_asteroid_distribution(entt::registry& registry, int count)
 {
     const float screenWidth  = GetScreenWidth();
@@ -143,6 +162,35 @@ void on_asteroid_collision(entt::registry& registry, entt::entity asteroid_entit
     }
 }
 
+entt::entity spawn_star(entt::registry& registry, Vector2 position, float angle)
+{
+    static const auto random_color = []() {
+        static const std::array<Color, 5> colors = {
+            Color{25, 25, 25, 255},
+            Color{50, 50, 50, 255},
+            Color{75, 75, 75, 255},
+        };
+
+        return colors[GetRandomValue(0, 2)];
+    };
+
+    static const std::uint32_t texture_tag = static_cast<std::uint32_t>(GAME_TEXTURES::MAINTEXTURE);
+
+    entt::entity entity = registry.create();
+
+    registry.emplace<transform>(entity, transform{position, angle});
+
+    float sprite_size = 32;
+    float scale       = 3 * 2 / sprite_size;
+    Rectangle source  = Rectangle{944, 432, sprite_size, sprite_size};
+
+    auto texture_entity = registry.view<Texture2D, entt::tag<texture_tag>>().front();
+    Texture2D tilesheet = registry.get<Texture2D>(texture_entity);
+
+    registry.emplace<sprite_render>(entity, sprite_render{tilesheet, source, scale, random_color()});
+
+    return entity;
+}
 static std::unique_ptr<float> a_radius_2_ptr = std::make_unique<float>(50.0f);
 static std::unique_ptr<float> a_radius_1_ptr = std::make_unique<float>(25.0f);
 static std::unique_ptr<float> a_radius_0_ptr = std::make_unique<float>(10.0f);
@@ -192,11 +240,6 @@ entt::entity spawn_asteroid(entt::registry& registry, Vector2 position, Vector2 
     entt::entity entity = registry.create();
     float angle         = atan2(velocity.y, velocity.x) * RAD2DEG;
     auto radius         = level_radius(level);
-
-    shape_render render_data;
-    render_data.color = WHITE;
-    render_data.shape = render_shape_type::CIRCLE;
-    render_data.data  = static_cast<void*>(radius);
 
     asteroid asteroid_data;
     asteroid_data.level = level;

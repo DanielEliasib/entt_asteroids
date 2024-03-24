@@ -26,6 +26,8 @@ struct sprite_render
     Rectangle source;
     float scale = 1.0f;
     Color tint  = WHITE;
+
+    Vector2 offset = {0, 0};
 };
 
 struct sprite_frame

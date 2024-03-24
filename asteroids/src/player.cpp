@@ -18,6 +18,13 @@ void on_player_explosion(entt::registry& registry, entt::entity player_entity, e
 {
     std::cout << "Player explosion collision" << std::endl;
 
+    auto trail_view = registry.view<entt::tag<player_trail_tag>>();
+
+    for (auto trail_entity : trail_view)
+    {
+        registry.emplace<entt::tag<kill_tag>>(trail_entity);
+    }
+
     auto player_physics   = registry.get<physics>(player_entity);
     auto player_transform = registry.get<transform>(player_entity);
 
@@ -104,12 +111,31 @@ entt::entity create_player(entt::registry& registry, uint8_t id)
         registry.emplace<Player>(player_data_entity, Player{id, 0, 3});
     }
 
-    float scale = player_collider.radius * 2 / 96.0f;
+    float scale  = player_collider.radius * 2 / 96.0f;
+    float scale2 = player_collider.radius * 2 / 64.0f;
 
     auto texture_entity = registry.view<Texture2D, entt::tag<texture_tag>>().front();
     Texture2D tilesheet = registry.get<Texture2D>(texture_entity);
 
     registry.emplace<sprite_render>(entity, sprite_render{tilesheet, Rectangle{528, 16, 96, 96}, scale});
+    // registry.emplace<sprite_render>(entity, sprite_render{tilesheet, Rectangle{800, 640, 64, 124}, scale2});
+
+    auto trail_entity = registry.create();
+    registry.emplace<transform>(
+        trail_entity,
+        transform{
+            Vector2{screenWidth * 0.5f, screenHeight * 0.5f},
+            0});
+
+    registry.emplace<entt::tag<player_trail_tag>>(trail_entity);
+    registry.emplace<sprite_render>(trail_entity,
+                                    sprite_render{
+                                        tilesheet,
+                                        Rectangle{928, 640, 64, 124},
+                                        // Rectangle{800, 640, 64, 124},
+                                        scale2,
+                                        WHITE,
+                                        Vector2{0, -(150 / 2) * scale2}});
 
     return entity;
 }

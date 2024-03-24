@@ -132,6 +132,7 @@ inline const void create_game_scene(std::shared_ptr<state>& scene_state)
     auto on_enter = [registry, input, general_scheduler, render_scheduler, cleanup_scheduler]() {
         general_scheduler->attach<lifetime_process>(*registry);
         general_scheduler->attach<enemy_ai_process>(*registry);
+        general_scheduler->attach<trail_update_process>(*registry);
         general_scheduler->attach<physics_process>(*registry);
         general_scheduler->attach<collision_process>(*registry);
         general_scheduler->attach<boundary_process>(*registry);
@@ -156,6 +157,8 @@ inline const void create_game_scene(std::shared_ptr<state>& scene_state)
         spawn_random_enemy(*registry);
 
         spawn_game_ui(*registry);
+
+        spawn_random_start_distribution(*registry, 30);
     };
 
     auto on_exit = [registry]() {
@@ -171,6 +174,13 @@ inline const void create_game_scene(std::shared_ptr<state>& scene_state)
 
     auto on_update = [registry, input, general_scheduler, render_scheduler, cleanup_scheduler](float delta_time) {
         const uint32_t delta_time_ms = delta_time * 1000;
+
+        auto trailer_view = registry->view<entt::tag<player_trail_tag>, sprite_render>();
+
+        for (auto [entity, sprite] : trailer_view.each())
+        {
+            sprite.tint = Color{0, 0, 0, 0};
+        }
 
         input->handle_input();
 

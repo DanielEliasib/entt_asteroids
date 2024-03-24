@@ -6,6 +6,7 @@
 #include <entt/entt.hpp>
 
 #include "components/base.hpp"
+#include "components/player.hpp"
 
 struct cleanup_process : entt::process<cleanup_process, std::uint32_t>
 {
@@ -113,4 +114,32 @@ struct boundary_process : entt::process<boundary_process, std::uint32_t>
     entt::registry& registry;
 };
 
+struct trail_update_process : entt::process<trail_update_process, std::uint32_t>
+{
+    using delta_type = std::uint32_t;
+
+    trail_update_process(entt::registry& registry) :
+        registry(registry) {}
+
+    void update(delta_type delta_time, void*)
+    {
+        auto player_view = registry.view<entt::tag<player_tag>, transform>();
+        auto trail_view  = registry.view<entt::tag<player_trail_tag>, transform>();
+
+        auto player_entity = player_view.front();
+        auto trail_entity  = trail_view.front();
+
+        if (!registry.valid(player_entity) || !registry.valid(trail_entity))
+            return;
+
+        auto& player_transform_data = registry.get<transform>(player_entity);
+        auto& trail_transform_data  = registry.get<transform>(trail_entity);
+
+        trail_transform_data.position = player_transform_data.position;
+        trail_transform_data.rotation = player_transform_data.rotation;
+    }
+
+   protected:
+    entt::registry& registry;
+};
 #endif // BASE_PROCESSORS_HPP

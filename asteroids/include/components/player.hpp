@@ -18,7 +18,8 @@ struct Player
     uint8_t lives;
 };
 
-static const std::uint32_t player_tag = "PLAYER"_hs;
+static const std::uint32_t player_tag       = "PLAYER"_hs;
+static const std::uint32_t player_trail_tag = "PLAYER_TRAIL"_hs;
 
 entt::entity create_player(entt::registry& registry, uint8_t id);
 
