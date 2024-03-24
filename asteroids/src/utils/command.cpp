@@ -85,7 +85,7 @@ void shoot_input_command::execute(Vector2 input)
 
     auto angle           = player_transform.rotation * DEG2RAD;
     auto direction       = Vector2{cos(angle), sin(angle)};
-    auto bullet_velocity = player_physics.velocity + direction * 320.0f;
+    auto bullet_velocity = direction * 400.0f;
     spawn_bullet(registry, player_transform.position, bullet_velocity, team::PLAYER);
 
     _shots_fired++;

@@ -127,7 +127,7 @@ entt::entity spawn_enemy(entt::registry& registry, Vector2 position)
             Vector2 direction = Vector2Subtract(player_transform.position, enemy_transform.position);
             direction         = Vector2Normalize(direction);
 
-            auto bullet_velocity = enemy_physics.velocity + direction * 320.0f;
+            auto bullet_velocity = direction * 360.0f;
 
             spawn_bullet(registry, enemy_transform.position, bullet_velocity, team::ENEMY);
         }
