@@ -44,8 +44,11 @@ enum struct team
 
 enum class GAME_TEXTURES : std::uint32_t
 {
-    MAINTEXTURE  = "MAINTEX"_hs,
-    PLANETEXTURE = "EXPTEX"_hs
-
+    MAINTEXTURE        = "MAINTEX"_hs,
+    PLANETEXTURE       = "EXPTEX"_hs,
+    SMOKETEXTURE       = "SMOKTEX"_hs,
+    BULLETTEXTURE_BLUE = "BULTBLUETEX"_hs,
+    BULLETTEXTURE_RED  = "BULTREDTEX"_hs,
+    EXPLOSIONTEXTURE   = "EXPLTEX"_hs,
 };
 #endif // BASE_DEFINITIONS_HPP

@@ -3,26 +3,31 @@
 
 #include <cassert>
 #include <functional>
+#include <iostream>
 #include <memory>
+#include <ostream>
 
 class state;
 
 class state_transition {
    public:
-    state_transition(std::function<bool()> condition, std::shared_ptr<state> target_state) :
+    state_transition(std::function<bool()> condition, std::shared_ptr<state> target_state, const char* name) :
         _condition(condition),
-        _target_state(target_state)
+        _target_state(target_state),
+        name(name)
     {
         assert(_condition != nullptr);
         assert(_target_state != nullptr);
     };
 
     bool evaluate() const { return _condition(); };
+    const char* get_name() const { return name; };
     std::shared_ptr<state> target_state() const { return _target_state; };
 
    protected:
     std::function<bool()> _condition     = nullptr;
     std::shared_ptr<state> _target_state = nullptr;
+    const char* name                     = "transition";
 };
 
 class state {
@@ -32,9 +37,9 @@ class state {
         _on_exit(on_exit),
         _update(update){};
 
-    void add_transition(std::function<bool()> condition, std::shared_ptr<state> target_state)
+    void add_transition(std::function<bool()> condition, std::shared_ptr<state> target_state, const char* name)
     {
-        _transitions.push_back(state_transition(condition, target_state));
+        _transitions.push_back(state_transition(condition, target_state, name));
     }
 
    protected:
@@ -52,6 +57,8 @@ class state {
         {
             if (!transition.evaluate())
                 continue;
+
+            std::cout << "Transitioning to " << transition.get_name() << std::endl;
 
             on_exit();
             next_state = transition.target_state();

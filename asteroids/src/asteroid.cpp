@@ -11,6 +11,51 @@
 #include "math.hpp"
 #include "teams.hpp"
 
+entt::entity spawn_smoke_explosion(entt::registry& registry, Vector2 position, int id, float radius, float duration)
+{
+    if (id < 0 || id >= 11)
+        return entt::null;
+
+    static const std::uint32_t texture_tag = static_cast<std::uint32_t>(GAME_TEXTURES::SMOKETEXTURE);
+
+    std::shared_ptr<std::vector<sprite_frame>> frame_sources = std::make_shared<std::vector<sprite_frame>>(11);
+
+    const int sprite_size = 64;
+    const int dx          = 64;
+    const int dy          = 64;
+
+    const float sprite_size_f = static_cast<float>(sprite_size);
+
+    const float scale = radius * 2 / sprite_size_f;
+
+    // OPTIMIZE: How to do this only once?
+    for (int i = 0; i < 11; i++)
+    {
+        frame_sources->at(i) = {
+            {i * sprite_size_f, id * sprite_size_f, sprite_size, sprite_size}};
+    }
+
+    auto texture_entity = registry.view<Texture2D, entt::tag<texture_tag>>().front();
+    Texture2D tilesheet = registry.get<Texture2D>(texture_entity);
+
+    entt::entity entity = registry.create();
+
+    sprite_sequence explosion_sequence = {
+        .frames              = frame_sources,
+        .loop                = false,
+        .update              = true,
+        .current_frame_index = 0,
+        .frame_time          = duration / 11.0f,
+    };
+
+    registry.emplace<sprite_render>(entity, sprite_render{tilesheet, frame_sources->at(0).source, scale, WHITE});
+    registry.emplace<sprite_sequence>(entity, explosion_sequence);
+    registry.emplace<transform>(entity, transform{position, 0});
+    registry.emplace<lifetime>(entity, lifetime{0.2f * 5, 0});
+
+    return entity;
+}
+
 void spawn_random_start_distribution(entt::registry& registry, int count)
 {
     const float screenWidth  = GetScreenWidth();
@@ -113,9 +158,14 @@ void on_asteroid_break(entt::registry& registry, entt::entity asteroid_entity, V
 
     on_player_score(registry, asteroid_entity, normalizedDirection, level);
 
+    auto transform_data = registry.get<transform>(asteroid_entity);
+    auto collision_data = registry.get<circle_collider>(asteroid_entity);
+
     if (level <= 0)
     {
         registry.emplace<entt::tag<kill_tag>>(asteroid_entity);
+
+        spawn_smoke_explosion(registry, transform_data.position, 8, collision_data.radius * 1.2f, 0.2f);
         return;
     }
 
@@ -129,8 +179,9 @@ void on_asteroid_break(entt::registry& registry, entt::entity asteroid_entity, V
         spawn_asteroid(registry, position, velocity, level);
     };
 
-    auto transform_data = registry.get<transform>(asteroid_entity);
-    auto physics_data   = registry.get<physics>(asteroid_entity);
+    auto physics_data = registry.get<physics>(asteroid_entity);
+
+    spawn_smoke_explosion(registry, transform_data.position, 2, collision_data.radius * 1.5f, 0.5f);
 
     std::cout << "Asteroid break level " << static_cast<int>(level) << std::endl;
     registry.emplace<entt::tag<kill_tag>>(asteroid_entity);

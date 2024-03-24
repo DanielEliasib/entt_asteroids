@@ -17,6 +17,7 @@ struct asteroid
 entt::entity spawn_star(entt::registry& registry, Vector2 position, float angle);
 entt::entity spawn_asteroid(entt::registry& registry, Vector2 position, Vector2 velocity, int8_t level);
 
+entt::entity spawn_smoke_explosion(entt::registry& registry, Vector2 position, int id, float radius, float duration);
 void spawn_random_asteroid_distribution(entt::registry& registry, int count);
 void spawn_random_start_distribution(entt::registry& registry, int count);
 #endif // ASTEROID_HPP

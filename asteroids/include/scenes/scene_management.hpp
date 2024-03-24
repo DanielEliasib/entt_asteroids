@@ -119,9 +119,9 @@ static const void create_title_scene(std::shared_ptr<state>& scene_state)
     scene_state = std::make_shared<state>(on_enter, on_exit, on_update);
 }
 
-inline const void create_game_scene(std::shared_ptr<state>& scene_state)
+inline const void create_game_scene(std::shared_ptr<state>& scene_state, std::shared_ptr<entt::registry>& registry)
 {
-    std::shared_ptr<entt::registry> registry = std::make_shared<entt::registry>();
+    registry = std::make_shared<entt::registry>();
 
     std::shared_ptr<input_handler> input = std::make_shared<input_handler>(*registry);
 
@@ -147,6 +147,9 @@ inline const void create_game_scene(std::shared_ptr<state>& scene_state)
         // INFO: Load textures
         LoadTextureToEntity<GAME_TEXTURES::MAINTEXTURE>("asteroids/resources/simpleSpace_tilesheet.png", *registry);
         LoadTextureToEntity<GAME_TEXTURES::PLANETEXTURE>("asteroids/resources/simplePlanes_tilesheet.png", *registry);
+        LoadTextureToEntity<GAME_TEXTURES::SMOKETEXTURE>("asteroids/resources/smoke_fx.png", *registry);
+        LoadTextureToEntity<GAME_TEXTURES::BULLETTEXTURE_BLUE>("asteroids/resources/bullet_blue.png", *registry);
+        LoadTextureToEntity<GAME_TEXTURES::BULLETTEXTURE_RED>("asteroids/resources/bullet_red.png", *registry);
 
         // INFO: Create player
         spawn_main_camera(*registry);
@@ -161,13 +164,17 @@ inline const void create_game_scene(std::shared_ptr<state>& scene_state)
         spawn_random_start_distribution(*registry, 30);
     };
 
-    auto on_exit = [registry]() {
+    auto on_exit = [registry, input, general_scheduler, render_scheduler, cleanup_scheduler]() {
         auto texture_view = registry->view<Texture2D>();
 
         for (auto [entity, texture] : texture_view.each())
         {
             UnloadTexture(texture);
         }
+
+        general_scheduler->clear();
+        render_scheduler->clear();
+        cleanup_scheduler->clear();
 
         registry->clear();
     };
@@ -207,7 +214,9 @@ static const state_machine create_game_state_machine()
 {
     std::shared_ptr<state> title_scene;
     std::shared_ptr<state> game_scene;
-    create_game_scene(game_scene);
+    std::shared_ptr<entt::registry> game_registry;
+
+    create_game_scene(game_scene, game_registry);
     create_title_scene(title_scene);
 
     state_machine game_state_machine(title_scene);
@@ -215,8 +224,20 @@ static const state_machine create_game_state_machine()
     title_scene->add_transition([]() {
         return IsKeyPressed(KEY_SPACE);
     },
-                                game_scene);
-    // game_state_machine.add_transition(game_scene, title_scene, "exit", []() { return true; });
+                                game_scene, "TITLE TO GAME");
+
+    game_scene->add_transition([game_registry]() {
+        auto player_view   = game_registry->view<Player>();
+        auto player_entity = player_view.front();
+
+        if (!game_registry->valid(player_entity))
+            return false;
+
+        auto& player_data = game_registry->get<Player>(player_entity);
+
+        return player_data.game_over && IsKeyPressed(KEY_SPACE);
+    },
+                               game_scene, "GAME TO GAME");
 
     return game_state_machine;
 }

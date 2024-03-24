@@ -156,13 +156,13 @@ entt::entity spawn_enemy(entt::registry& registry, Vector2 position)
 
         return sqr_distance < radius * radius;
     };
-    chasing_state->add_transition(attack_condition, attack_state);
+    chasing_state->add_transition(attack_condition, attack_state, "TO ATTACK");
 
     // INFO: FROM ATTACK TO CHASING
     static auto chasing_condition = [&registry]() {
         return !attack_condition();
     };
-    attack_state->add_transition(chasing_condition, chasing_state);
+    attack_state->add_transition(chasing_condition, chasing_state, "TO CHASING");
 
     auto ai_machine = std::make_shared<state_machine>(chasing_state);
     registry.emplace<enemy_ai>(entity, ai_machine);

@@ -37,14 +37,16 @@ struct sprite_frame
 
 struct sprite_sequence
 {
-    sprite_frame* frames;
-    sprite_frame* first_frame;
+    // sprite_frame* frames;
+    // sprite_frame* first_frame;
+
+    std::shared_ptr<std::vector<sprite_frame>> frames;
 
     bool loop;
     bool update;
 
     int frame_count;
-    int current_frame;
+    int current_frame_index;
 
     float frame_time;
     float current_delta;

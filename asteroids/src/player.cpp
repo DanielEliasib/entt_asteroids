@@ -5,14 +5,18 @@
 #include <components/base.hpp>
 #include <cstdint>
 #include <functional>
+#include <initializer_list>
 #include <iomanip>
 #include <iostream>
 #include <math.hpp>
+#include <memory>
 #include <sstream>
+#include <vector>
 
 #include "components/physics.hpp"
 #include "components/render.hpp"
 #include "raylib.h"
+#include "scenes/scene_management.hpp"
 
 void on_player_explosion(entt::registry& registry, entt::entity player_entity, entt::entity other_entity)
 {
@@ -173,9 +177,17 @@ static std::unique_ptr<float> radius_ptr = std::make_unique<float>(1.5f);
 
 entt::entity spawn_bullet(entt::registry& registry, Vector2 position, Vector2 velocity, const team& bullet_team)
 {
-    static const std::uint32_t texture_tag = static_cast<std::uint32_t>(GAME_TEXTURES::MAINTEXTURE);
-    entt::entity entity                    = registry.create();
-    float angle                            = atan2(velocity.y, velocity.x) * RAD2DEG;
+    static const std::uint32_t blue_texture_tag = static_cast<std::uint32_t>(GAME_TEXTURES::BULLETTEXTURE_BLUE);
+    static const std::uint32_t red_texture_tag  = static_cast<std::uint32_t>(GAME_TEXTURES::BULLETTEXTURE_RED);
+
+    static std::shared_ptr<std::vector<sprite_frame>> frames =
+        std::make_shared<std::vector<sprite_frame>>(std::initializer_list<sprite_frame>{{Rectangle{256, 96, 16, 16}},
+                                                                                        {Rectangle{272, 96, 16, 16}},
+                                                                                        {Rectangle{288, 96, 16, 16}},
+                                                                                        {Rectangle{304, 96, 16, 16}}});
+
+    entt::entity entity = registry.create();
+    float angle         = atan2(velocity.y, velocity.x) * RAD2DEG;
 
     registry.emplace<transform>(entity, transform{position, angle});
     registry.emplace<physics>(entity, physics{velocity, 0, 0.0f, Vector2{0, 0}, Vector2{0, 0}});
@@ -187,17 +199,33 @@ entt::entity spawn_bullet(entt::registry& registry, Vector2 position, Vector2 ve
     bullet_collider.on_collision.connect<&on_bullet_collision>();
     registry.emplace<circle_collider>(entity, bullet_collider);
 
-    float scale = bullet_collider.radius * 2 / 32.0f;
+    float scale = bullet_collider.radius * 2 / 16.0f;
 
-    auto texture_entity = registry.view<Texture2D, entt::tag<texture_tag>>().front();
+    entt::entity texture_entity = entt::null;
+    if (bullet_team == team::PLAYER)
+    {
+        texture_entity = registry.view<Texture2D, entt::tag<blue_texture_tag>>().front();
+    } else
+    {
+        texture_entity = registry.view<Texture2D, entt::tag<red_texture_tag>>().front();
+    }
+
     Texture2D tilesheet = registry.get<Texture2D>(texture_entity);
 
+    sprite_sequence explosion_sequence = {
+        .frames              = frames,
+        .loop                = true,
+        .update              = true,
+        .current_frame_index = 0,
+        .frame_time          = 0.2f,
+    };
     registry.emplace<sprite_render>(entity,
                                     sprite_render{
                                         tilesheet,
-                                        Rectangle{560, 432, 32, 32},
+                                        frames->at(0).source,
                                         scale,
-                                        bullet_team == team::PLAYER ? BLUE : RED});
+                                        WHITE});
+    registry.emplace<sprite_sequence>(entity, explosion_sequence);
 
     registry.emplace<team>(entity, bullet_team);
 
@@ -206,13 +234,14 @@ entt::entity spawn_bullet(entt::registry& registry, Vector2 position, Vector2 ve
 
 entt::entity spawn_explosion(entt::registry& registry, Vector2 position, float scale)
 {
-    static const std::uint32_t texture_tag    = static_cast<std::uint32_t>(GAME_TEXTURES::PLANETEXTURE);
-    static std::array<sprite_frame, 5> frames = {
-        {Rectangle{68, 0, 16, 16},
-         Rectangle{85, 0, 16, 16},
-         Rectangle{102, 0, 16, 16},
-         Rectangle{119, 0, 16, 16},
-         Rectangle{136, 0, 16, 16}}};
+    static const std::uint32_t texture_tag = static_cast<std::uint32_t>(GAME_TEXTURES::PLANETEXTURE);
+
+    static std::shared_ptr<std::vector<sprite_frame>> frames =
+        std::make_shared<std::vector<sprite_frame>>(std::initializer_list<sprite_frame>{{Rectangle{68, 0, 16, 16}},
+                                                                                        {Rectangle{85, 0, 16, 16}},
+                                                                                        {Rectangle{102, 0, 16, 16}},
+                                                                                        {Rectangle{119, 0, 16, 16}},
+                                                                                        {Rectangle{136, 0, 16, 16}}});
 
     auto texture_entity = registry.view<Texture2D, entt::tag<texture_tag>>().front();
     Texture2D tilesheet = registry.get<Texture2D>(texture_entity);
@@ -220,16 +249,14 @@ entt::entity spawn_explosion(entt::registry& registry, Vector2 position, float s
     entt::entity entity = registry.create();
 
     sprite_sequence explosion_sequence = {
-        .frames        = frames.data(),
-        .first_frame   = frames.data(),
-        .loop          = false,
-        .update        = true,
-        .frame_count   = 5,
-        .current_frame = 0,
-        .frame_time    = 0.2f,
+        .frames              = frames,
+        .loop                = false,
+        .update              = true,
+        .current_frame_index = 0,
+        .frame_time          = 0.2f,
     };
 
-    registry.emplace<sprite_render>(entity, sprite_render{tilesheet, frames[0].source, scale, WHITE});
+    registry.emplace<sprite_render>(entity, sprite_render{tilesheet, frames->at(0).source, scale, WHITE});
     registry.emplace<sprite_sequence>(entity, explosion_sequence);
     registry.emplace<transform>(entity, transform{position, 0});
     registry.emplace<lifetime>(entity, lifetime{0.2f * 5, 0});
@@ -352,4 +379,24 @@ void spawn_game_over(entt::registry& registry)
 
     make_text(subtitle_text, fontSize, position, RAYWHITE);
     make_text(subtitle_text, fontSize, position + Vector2{5, 5}, BLACK);
+
+    const char* restart_text = "Press SPACE to restart";
+
+    fontSize  = 20;
+    textWidth = MeasureText(restart_text, fontSize);
+
+    position = Vector2{(screenWidth - textWidth) / 2.0f,
+                       screenHeight / 2.0f + 50.0f};
+
+    make_text(restart_text, fontSize, position, text_color);
+    make_text(restart_text, fontSize, position + Vector2{5, 5}, BLACK);
+
+    auto player_view   = registry.view<Player>();
+    auto player_entity = player_view.front();
+
+    if (!registry.valid(player_entity))
+        return;
+
+    auto& player_data     = registry.get<Player>(player_entity);
+    player_data.game_over = true;
 }

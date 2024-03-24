@@ -16,6 +16,8 @@ struct Player
     uint8_t id; // INFO: dummy data for now
     uint32_t score;
     uint8_t lives;
+
+    bool game_over = false;
 };
 
 static const std::uint32_t player_tag       = "PLAYER"_hs;

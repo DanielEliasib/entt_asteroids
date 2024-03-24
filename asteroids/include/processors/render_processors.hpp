@@ -9,9 +9,11 @@
 #include <entt/entt.hpp>
 #include <iomanip>
 #include <iostream>
+#include <math.hpp>
 #include <sstream>
 
 #include "components/player.hpp"
+
 
 struct text_render_process : entt::process<text_render_process, std::uint32_t>
 {
@@ -171,28 +173,18 @@ struct sprite_sequence_process : entt::process<sprite_sequence_process, std::uin
                 continue;
 
             sequence_data.current_delta += delta_time_seconds;
+            if (sequence_data.current_delta < sequence_data.frame_time)
+                continue;
 
-            if (sequence_data.current_delta >= sequence_data.frame_time)
+            sequence_data.current_delta       = 0;
+            sequence_data.current_frame_index = (sequence_data.current_frame_index + 1) % sequence_data.frames->size();
+
+            if (sequence_data.current_frame_index == 0 && !sequence_data.loop)
             {
-                sequence_data.current_delta = 0;
-                sequence_data.current_frame = (sequence_data.current_frame + 1) % sequence_data.frame_count;
-
-                if (sequence_data.current_frame == 0)
-                {
-                    if (sequence_data.loop)
-                    {
-                        sequence_data.frames = sequence_data.first_frame;
-                    } else
-                    {
-                        sequence_data.update = false;
-                    }
-                } else
-                {
-                    sequence_data.frames++;
-                }
-
-                render_data.source = sequence_data.frames->source;
+                sequence_data.update = false;
             }
+
+            render_data.source = sequence_data.frames->at(sequence_data.current_frame_index).source;
         }
     }
 
