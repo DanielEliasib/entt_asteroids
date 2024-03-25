@@ -20,8 +20,6 @@
 
 void on_player_explosion(entt::registry& registry, entt::entity player_entity, entt::entity other_entity)
 {
-    std::cout << "Player explosion collision" << std::endl;
-
     auto trail_view = registry.view<entt::tag<player_trail_tag>>();
 
     for (auto trail_entity : trail_view)
@@ -146,7 +144,6 @@ entt::entity create_player(entt::registry& registry, uint8_t id)
 
 void on_bullet_collision(entt::registry& registry, entt::entity bullet_entity, entt::entity other_entity)
 {
-    std::cout << "Bullet collision" << std::endl;
     if (!registry.all_of<bullet_collision_response>(other_entity))
         return;
 

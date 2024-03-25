@@ -183,7 +183,6 @@ void on_asteroid_break(entt::registry& registry, entt::entity asteroid_entity, V
 
     spawn_smoke_explosion(registry, transform_data.position, 2, collision_data.radius * 1.5f, 0.5f);
 
-    std::cout << "Asteroid break level " << static_cast<int>(level) << std::endl;
     registry.emplace<entt::tag<kill_tag>>(asteroid_entity);
 
     generate_asteroid(transform_data.position, physics_data.velocity);
@@ -192,7 +191,6 @@ void on_asteroid_break(entt::registry& registry, entt::entity asteroid_entity, V
 
 void on_asteroid_collision(entt::registry& registry, entt::entity asteroid_entity, entt::entity other_entity)
 {
-    std::cout << "Asteroid collision" << std::endl;
     if (!registry.all_of<asteroid_collision_response>(other_entity))
         return;
 
@@ -284,7 +282,6 @@ entt::entity spawn_asteroid(entt::registry& registry, Vector2 position, Vector2 
 
     if (level <= 0)
     {
-        std::cout << "Spawn invalid asteroid" << std::endl;
         return entt::null;
     }
 
