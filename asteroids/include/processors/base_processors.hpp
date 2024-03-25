@@ -21,6 +21,9 @@ struct cleanup_process : entt::process<cleanup_process, std::uint32_t>
 
         for (auto [entity] : cleanup_view.each())
         {
+            if (!registry.valid(entity))
+                continue;
+
             registry.destroy(entity);
         }
     }
