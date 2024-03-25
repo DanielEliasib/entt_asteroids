@@ -1,6 +1,6 @@
 # entt_asteroids
 
-![asteroids](./resources/gameplay.gif)
+[![asteroids](./resources/gameplay.gif)](https://youtu.be/8LKhvwPE0EY)
 
 An ecs asteroids prototype implemented using [EnTT](https://github.com/skypjack/entt) and [Raylib](https://github.com/raysan5/raylib).
 
