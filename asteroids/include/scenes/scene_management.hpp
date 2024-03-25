@@ -35,7 +35,7 @@ static const void create_title_scene(std::shared_ptr<state>& scene_state)
         render_scheduler->attach<sprite_sequence_process>(*registry);
 
         // INFO: Load textures
-        LoadTextureToEntity<GAME_TEXTURES::MAINTEXTURE>("asteroids/resources/simpleSpace_tilesheet.png", *registry);
+        LoadTextureToEntity<GAME_TEXTURES::MAINTEXTURE>("resources/simpleSpace_tilesheet.png", *registry);
 
         // INFO: Create player
         spawn_main_camera(*registry);
@@ -134,7 +134,7 @@ static const void create_score_scene(std::shared_ptr<state>& scene_state, std::s
         render_scheduler->attach<sprite_sequence_process>(*registry);
 
         // INFO: Load textures
-        LoadTextureToEntity<GAME_TEXTURES::MAINTEXTURE>("asteroids/resources/simpleSpace_tilesheet.png", *registry);
+        LoadTextureToEntity<GAME_TEXTURES::MAINTEXTURE>("resources/simpleSpace_tilesheet.png", *registry);
 
         // INFO: Create player
         spawn_main_camera(*registry);
@@ -281,11 +281,11 @@ inline const void create_game_scene(std::shared_ptr<state>& scene_state, std::sh
         cleanup_scheduler->attach<cleanup_process>(*registry);
 
         // INFO: Load textures
-        LoadTextureToEntity<GAME_TEXTURES::MAINTEXTURE>("asteroids/resources/simpleSpace_tilesheet.png", *registry);
-        LoadTextureToEntity<GAME_TEXTURES::PLANETEXTURE>("asteroids/resources/simplePlanes_tilesheet.png", *registry);
-        LoadTextureToEntity<GAME_TEXTURES::SMOKETEXTURE>("asteroids/resources/smoke_fx.png", *registry);
-        LoadTextureToEntity<GAME_TEXTURES::BULLETTEXTURE_BLUE>("asteroids/resources/bullet_blue.png", *registry);
-        LoadTextureToEntity<GAME_TEXTURES::BULLETTEXTURE_RED>("asteroids/resources/bullet_red.png", *registry);
+        LoadTextureToEntity<GAME_TEXTURES::MAINTEXTURE>("resources/simpleSpace_tilesheet.png", *registry);
+        LoadTextureToEntity<GAME_TEXTURES::PLANETEXTURE>("resources/simplePlanes_tilesheet.png", *registry);
+        LoadTextureToEntity<GAME_TEXTURES::SMOKETEXTURE>("resources/smoke_fx.png", *registry);
+        LoadTextureToEntity<GAME_TEXTURES::BULLETTEXTURE_BLUE>("resources/bullet_blue.png", *registry);
+        LoadTextureToEntity<GAME_TEXTURES::BULLETTEXTURE_RED>("resources/bullet_red.png", *registry);
 
         // INFO: Create player
         spawn_main_camera(*registry);

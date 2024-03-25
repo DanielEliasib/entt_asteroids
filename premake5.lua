@@ -27,6 +27,10 @@ project "asteroids"
 
 	files { "%{prj.location}/**.h", "%{prj.location}/**.hpp", "%{prj.location}/**.cpp" }
 
+	prebuildcommands {
+		"{COPYDIR} %{prj.location}/resources/ %{wks.location}/bin/%{prj.name}/%{cfg.buildcfg}/resources/",
+	}
+	
 	filter "configurations:debug"
 		defines { "DEBUG" }
 		symbols "On"
